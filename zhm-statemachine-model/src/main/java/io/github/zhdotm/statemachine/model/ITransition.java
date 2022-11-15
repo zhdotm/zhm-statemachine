@@ -3,7 +3,7 @@ package io.github.zhdotm.statemachine.model;
 
 import io.github.zhdotm.statemachine.annotation.Transition;
 import io.github.zhdotm.statemachine.constant.TransitionTypeEnum;
-import io.github.zhdotm.statemachine.exp.BizStateMachineException;
+import io.github.zhdotm.statemachine.exception.BizStateMachineException;
 
 /**
  * 转换
@@ -99,7 +99,7 @@ public interface ITransition {
      *
      * @return 条件
      */
-   ICondition getCondition();
+    ICondition getCondition();
 
     /**
      * 获取动作
@@ -127,12 +127,13 @@ public interface ITransition {
      *
      * @param args 动作参数
      * @return 下个状态
+     * @throws BizStateMachineException 状态机业务异常
      */
     default IState transfer(Object... args) throws BizStateMachineException {
         TransitionTypeEnum transitionType = getType();
         IAction action = getAction();
         Boolean invokeIsSuccess = action.invoke(args);
-        if (!invokeIsSuccess){
+        if (!invokeIsSuccess) {
 
             throw new BizStateMachineException(String.format("transition[%s]执行失败: action[%s]执行失败", getTransitionId(), action.getActionId()));
         }

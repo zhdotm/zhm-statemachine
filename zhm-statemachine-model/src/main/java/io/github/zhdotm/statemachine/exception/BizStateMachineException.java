@@ -1,4 +1,4 @@
-package io.github.zhdotm.statemachine.exp;
+package io.github.zhdotm.statemachine.exception;
 
 /**
  * 状态机业务异常
