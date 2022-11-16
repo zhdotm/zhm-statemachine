@@ -1,4 +1,4 @@
-package io.github.zhdotm.statemachine.model;
+package io.github.zhdotm.statemachine.domain;
 
 
 import io.github.zhdotm.statemachine.annotation.Transition;
