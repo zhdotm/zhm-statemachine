@@ -47,7 +47,7 @@ public interface IStateMachine {
      * @param state 当前状态
      * @return 可使用转换
      */
-    Collection<ITransition> getTransition(IState state);
+    Collection<ITransition> getTransitions(IState state);
 
     /**
      * 推进
@@ -58,7 +58,7 @@ public interface IStateMachine {
      * @throws BizStateMachineException 状态机业务异常
      */
     default IState advance(IState state, IEvent event) throws BizStateMachineException {
-        Collection<ITransition> transitions = getTransition(state);
+        Collection<ITransition> transitions = getTransitions(state);
         if (transitions == null || transitions.size() == 0) {
 
             throw new BizStateMachineException(String.format("状态机推进失败: state[%s]在stateMachine[%s]中不存在对应transition", state.getStateId(), getStateMachineId()));

@@ -121,7 +121,7 @@ public interface IStateMachineSupport {
             }
 
             @Override
-            public Collection<ITransition> getTransition(IState state) {
+            public Collection<ITransition> getTransitions(IState state) {
                 String stateId = state.getStateId();
                 IState stateOld = stateIdStateMap.get(stateId);
 

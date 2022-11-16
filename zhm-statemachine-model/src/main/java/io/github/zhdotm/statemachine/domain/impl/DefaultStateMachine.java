@@ -43,9 +43,9 @@ public class DefaultStateMachine implements IStateMachine {
     }
 
     @Override
-    public Collection<ITransition> getTransition(IState state) {
+    public Collection<ITransition> getTransitions(IState state) {
 
-        return stateMachine.getTransition(state);
+        return stateMachine.getTransitions(state);
     }
 
 }
