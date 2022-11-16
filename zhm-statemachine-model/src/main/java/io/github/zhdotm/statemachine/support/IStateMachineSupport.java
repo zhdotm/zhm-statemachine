@@ -1,6 +1,7 @@
 package io.github.zhdotm.statemachine.support;
 
 
+import io.github.zhdotm.statemachine.constant.StateTypeEnum;
 import io.github.zhdotm.statemachine.constant.TransitionTypeEnum;
 import io.github.zhdotm.statemachine.domain.*;
 import io.github.zhdotm.statemachine.exception.BizStateMachineException;
@@ -68,8 +69,7 @@ public interface IStateMachineSupport {
         }
 
         for (ITransition transition : transitions) {
-
-            checkTransition(transition);
+            checkTransition(stateMachineId, transition);
         }
 
         Map<IState, List<ITransition>> stateTransitionListMap = transitions
@@ -90,7 +90,7 @@ public interface IStateMachineSupport {
                 }
             });
         });
-        
+
         List<IState> stateList = new ArrayList<IState>() {
             {
                 addAll(stateSet);
@@ -133,55 +133,98 @@ public interface IStateMachineSupport {
     /**
      * 检查转换的完整性
      *
-     * @param transition 转换
+     * @param stateMachineId 状态机ID
+     * @param transition     转换
      * @throws BizStateMachineException 业务异常
      */
-    default void checkTransition(ITransition transition) throws BizStateMachineException {
+    default void checkTransition(String stateMachineId, ITransition transition) throws BizStateMachineException {
         if (transition == null) {
 
             return;
         }
 
+        String stateMachineIdTemp = transition.getStateMachineId();
+        if (null == stateMachineIdTemp || "".equalsIgnoreCase(stateMachineIdTemp)) {
+
+            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换未指定对应状态机ID, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
+        }
+
+        if (!stateMachineIdTemp.equalsIgnoreCase(stateMachineId)) {
+
+            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换的状态机ID与输入的状态机ID不一致, stateMachine[%s], transition[%s], transitionStateMachineId[%s]", stateMachineId, transition.getTransitionId(), stateMachineIdTemp));
+        }
+
         String transitionId = transition.getTransitionId();
         if (transitionId == null || "".equalsIgnoreCase(transitionId)) {
 
-            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换ID为空, stateMachine[%s], transition[%s]", transition.getStateMachineId(), transition.getTransitionId()));
+            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换ID为空, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
         }
 
         TransitionTypeEnum type = transition.getType();
         if (type == null) {
 
-            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换类型为空, stateMachine[%s], transition[%s]", transition.getStateMachineId(), transition.getTransitionId()));
+            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换类型为空, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
         }
 
         ICondition condition = transition.getCondition();
         if (condition == null) {
 
-            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换条件为空, stateMachine[%s], transition[%s]", transition.getStateMachineId(), transition.getTransitionId()));
+            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换条件为空, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
         }
 
         IAction action = transition.getAction();
         if (action == null) {
 
-            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换动作为空, stateMachine[%s], transition[%s]", transition.getStateMachineId(), transition.getTransitionId()));
+            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换动作为空, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
         }
 
         IState currentState = transition.getCurrentState();
         if (currentState == null) {
 
-            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换的初始状态为空, stateMachine[%s], transition[%s]", transition.getStateMachineId(), transition.getTransitionId()));
+            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换的初始状态为空, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
+        }
+
+        stateMachineIdTemp = currentState.getStateMachineId();
+        if (stateMachineIdTemp == null || "".equalsIgnoreCase(stateMachineIdTemp)) {
+
+            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换的初始状态未指定状态机ID, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
+        }
+
+        if (!stateMachineIdTemp.equalsIgnoreCase(stateMachineId)) {
+
+            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换的初始化状态机ID与输入的状态机ID不一致, stateMachine[%s], transition[%s], transitionStateMachineId[%s]", stateMachineId, transition.getTransitionId(), stateMachineIdTemp));
         }
 
         IState nextState = transition.getNextState();
         if (nextState == null && TransitionTypeEnum.EXTERNAL == type) {
 
-            throw new BizStateMachineException(String.format("检查转换完整性失败: 外部转换类型不能没有下个转换状态, stateMachine[%s], transition[%s]", transition.getStateMachineId(), transition.getTransitionId()));
+            throw new BizStateMachineException(String.format("检查转换完整性失败: 外部转换类型不能没有下个转换状态, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
+        }
+
+        if (nextState != null) {
+            stateMachineIdTemp = nextState.getStateMachineId();
+            if (stateMachineIdTemp == null || "".equalsIgnoreCase(stateMachineIdTemp)) {
+
+                throw new BizStateMachineException(String.format("检查转换完整性失败: 下个转换状态未指定状态机ID, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
+            }
+
+            if (!stateMachineIdTemp.equalsIgnoreCase(stateMachineId)) {
+
+                throw new BizStateMachineException(String.format("检查转换完整性失败: 下个转换状态不属于当前状态机, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
+            }
+
+            String nextStateMachineId = nextState.getNextStateMachineId();
+            if (!(nextStateMachineId != null && !"".equalsIgnoreCase(nextStateMachineId))
+                    && nextState.getType() == StateTypeEnum.BRIDGE) {
+
+                throw new BizStateMachineException(String.format("检查转换完整性失败: 下个转换状态为桥类型状态但未指定下个状态机ID, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
+            }
         }
 
         Integer sortId = transition.getSortId();
         if (sortId == null) {
 
-            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换排序为空, stateMachine[%s], transition[%s]", transition.getStateMachineId(), transition.getTransitionId()));
+            throw new BizStateMachineException(String.format("检查转换完整性失败: 转换排序为空, stateMachine[%s], transition[%s]", stateMachineId, transition.getTransitionId()));
         }
 
     }

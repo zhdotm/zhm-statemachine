@@ -71,9 +71,28 @@ public interface ITransition {
     /**
      * 获取状态机ID
      *
+     * @param stateMachineId 状态机ID
+     */
+    void setStateMachineId(String stateMachineId);
+
+    /**
+     * 获取状态机ID
+     *
      * @return 状态机ID
      */
-    default String getStateMachineId() {
+    String getStateMachineId();
+
+    /**
+     * 获取状态机ID
+     *
+     * @return 状态机ID
+     */
+    default String getStateMachineIdWithAnnotation() {
+        String stateMachineId = getStateMachineId();
+        if (null != stateMachineId && !"".equalsIgnoreCase(stateMachineId)) {
+
+            return stateMachineId;
+        }
         Class<? extends ITransition> clazz = this.getClass();
         Transition transition = clazz.getAnnotation(Transition.class);
 

@@ -112,6 +112,18 @@ public interface IStateMachine {
 
                     return nextStateMachineId;
                 }
+
+                @Override
+                public StateTypeEnum getType() {
+
+                    return StateTypeEnum.NORMAL;
+                }
+
+                @Override
+                public String getNextStateMachineId() {
+
+                    return null;
+                }
             };
         }
 

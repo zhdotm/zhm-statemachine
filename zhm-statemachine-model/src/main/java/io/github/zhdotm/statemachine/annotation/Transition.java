@@ -1,7 +1,6 @@
 package io.github.zhdotm.statemachine.annotation;
 
 
-
 import io.github.zhdotm.statemachine.constant.TransitionTypeEnum;
 
 import java.lang.annotation.*;
@@ -16,6 +15,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Transition {
+    
     /**
      * 所属状态机ID
      *

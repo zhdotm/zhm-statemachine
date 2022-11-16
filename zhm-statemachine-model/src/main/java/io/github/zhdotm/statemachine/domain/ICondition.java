@@ -23,7 +23,20 @@ public interface ICondition {
      *
      * @return 状态机ID
      */
-    default String getStateMachineId() {
+    String getStateMachineId();
+
+    /**
+     * 获取状态机ID
+     *
+     * @return 状态机ID
+     */
+    default String getStateMachineIdWithAnnotation() {
+        String stateMachineId = getStateMachineId();
+        if (null != stateMachineId && !"".equalsIgnoreCase(stateMachineId)) {
+
+            return stateMachineId;
+        }
+        
         Class<? extends ICondition> clazz = this.getClass();
         Condition condition = clazz.getAnnotation(Condition.class);
 

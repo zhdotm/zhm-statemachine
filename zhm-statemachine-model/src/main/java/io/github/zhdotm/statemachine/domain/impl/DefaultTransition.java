@@ -12,6 +12,8 @@ public class DefaultTransition extends AbstractTransition {
 
     private String transitionId;
 
+    private String stateMachineId;
+
     public DefaultTransition(String transitionId) {
         this.transitionId = transitionId;
     }
@@ -35,6 +37,12 @@ public class DefaultTransition extends AbstractTransition {
         return this;
     }
 
+    public DefaultTransition stateMachineId(String stateMachineId) {
+        this.stateMachineId = stateMachineId;
+
+        return this;
+    }
+
     @Override
     public String getTransitionId() {
         return transitionId;
@@ -42,5 +50,17 @@ public class DefaultTransition extends AbstractTransition {
 
     public void setTransitionId(String transitionId) {
         this.transitionId = transitionId;
+    }
+
+    @Override
+    public String getStateMachineId() {
+
+        return this.stateMachineId;
+    }
+
+    @Override
+    public void setStateMachineId(String stateMachineId) {
+
+        this.stateMachineId = stateMachineId;
     }
 }

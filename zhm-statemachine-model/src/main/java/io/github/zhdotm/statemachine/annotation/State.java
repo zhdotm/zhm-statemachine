@@ -1,6 +1,8 @@
 package io.github.zhdotm.statemachine.annotation;
 
 
+import io.github.zhdotm.statemachine.constant.StateTypeEnum;
+
 import java.lang.annotation.*;
 
 /**
@@ -22,4 +24,17 @@ public @interface State {
      */
     String stateMachineId();
 
+    /**
+     * 状态类型
+     *
+     * @return 状态类型
+     */
+    StateTypeEnum type();
+
+    /**
+     * 下一个状态机ID
+     *
+     * @return 状态机ID
+     */
+    String nextStateMachineId();
 }

@@ -24,9 +24,34 @@ public interface IState {
      *
      * @return 状态机ID
      */
-    default String getStateMachineId() {
-        Class<? extends IState> clazz = this.getClass();
-        State state = clazz.getAnnotation(State.class);
+    String getStateMachineId();
+
+    /**
+     * 状态类型
+     *
+     * @return 状态类型
+     */
+    StateTypeEnum getType();
+
+    /**
+     * 获取下一个状态机ID
+     *
+     * @return 状态机ID
+     */
+    String getNextStateMachineId();
+
+    /**
+     * 获取状态机ID
+     *
+     * @return 状态机ID
+     */
+    default String getStateMachineIdWithAnnotation() {
+        String stateMachineId = getStateMachineId();
+        if (stateMachineId != null && !"".equalsIgnoreCase(stateMachineId)) {
+
+            return stateMachineId;
+        }
+        State state = getStateAnnotation();
 
         return state == null ? null : state.stateMachineId();
     }
@@ -36,9 +61,16 @@ public interface IState {
      *
      * @return 状态类型
      */
-    default StateTypeEnum getType() {
+    default StateTypeEnum getTypeWithAnnotation() {
+        StateTypeEnum type = getType();
+        if (type != null) {
 
-        return StateTypeEnum.NORMAL;
+            return type;
+        }
+
+        State state = getStateAnnotation();
+
+        return state == null ? StateTypeEnum.NORMAL : state.type();
     }
 
     /**
@@ -46,9 +78,26 @@ public interface IState {
      *
      * @return 下个状态机ID
      */
-    default String getNextStateMachineId() {
+    default String getNextStateMachineIdWithAnnotation() {
+        String nextStateMachineId = getNextStateMachineId();
+        if (nextStateMachineId != null && !"".equalsIgnoreCase(nextStateMachineId)) {
 
-        return null;
+            return nextStateMachineId;
+        }
+        State state = getStateAnnotation();
+
+        return state == null ? null : state.nextStateMachineId();
+    }
+
+    /**
+     * 获取state注解
+     *
+     * @return state注解
+     */
+    default State getStateAnnotation() {
+        Class<? extends IState> clazz = this.getClass();
+
+        return clazz.getAnnotation(State.class);
     }
 
 }
