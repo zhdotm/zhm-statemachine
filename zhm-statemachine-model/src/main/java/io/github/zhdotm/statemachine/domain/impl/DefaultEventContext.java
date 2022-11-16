@@ -24,6 +24,25 @@ public class DefaultEventContext implements IEventContext {
         this.event = event;
     }
 
+    public DefaultEventContext() {
+    }
+
+    public static DefaultEventContext getInstance(String stateMachineId, String stateId, IEvent event) {
+
+        return new DefaultEventContext(stateMachineId, stateId, event);
+    }
+
+    public static DefaultEventContext getInstance() {
+
+        return new DefaultEventContext();
+    }
+
+    public DefaultEventContext stateMachineId(String stateMachineId) {
+        this.stateMachineId = stateMachineId;
+
+        return this;
+    }
+
     @Override
     public String getStateMachineId() {
         return stateMachineId;

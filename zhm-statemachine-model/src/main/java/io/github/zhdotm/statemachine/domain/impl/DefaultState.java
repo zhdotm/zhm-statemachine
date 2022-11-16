@@ -16,6 +16,25 @@ public class DefaultState implements IState {
         this.stateId = stateId;
     }
 
+    public DefaultState() {
+    }
+
+    public static DefaultState getInstance(String stateId) {
+
+        return new DefaultState(stateId);
+    }
+
+    public static DefaultState getInstance() {
+
+        return new DefaultState();
+    }
+
+    public DefaultState stateId(String stateId) {
+        this.stateId = stateId;
+
+        return this;
+    }
+
     @Override
     public String getStateId() {
         return stateId;

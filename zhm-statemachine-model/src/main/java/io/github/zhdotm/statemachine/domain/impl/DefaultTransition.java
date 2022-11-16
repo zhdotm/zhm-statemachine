@@ -16,6 +16,25 @@ public class DefaultTransition extends AbstractTransition {
         this.transitionId = transitionId;
     }
 
+    public DefaultTransition() {
+    }
+
+    public static DefaultTransition getInstance(String transitionId) {
+
+        return new DefaultTransition(transitionId);
+    }
+
+    public static DefaultTransition getInstance() {
+
+        return new DefaultTransition();
+    }
+
+    public DefaultTransition transitionId(String transitionId) {
+        this.transitionId = transitionId;
+
+        return this;
+    }
+
     @Override
     public String getTransitionId() {
         return transitionId;

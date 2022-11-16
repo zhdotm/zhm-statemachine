@@ -20,8 +20,8 @@ public class DefaultStateMachine implements IStateMachine {
 
     private final IStateMachine stateMachine;
 
-    public DefaultStateMachine(String stateMachineId, List<ITransition> allTransitionList, IStateMachineSupport stateMachineSupport) throws BizStateMachineException {
-        stateMachine = stateMachineSupport.build(stateMachineId, allTransitionList);
+    public DefaultStateMachine(String stateMachineId, List<ITransition> transitions, IStateMachineSupport stateMachineSupport) throws BizStateMachineException {
+        stateMachine = stateMachineSupport.build(stateMachineId, transitions);
     }
 
     @Override

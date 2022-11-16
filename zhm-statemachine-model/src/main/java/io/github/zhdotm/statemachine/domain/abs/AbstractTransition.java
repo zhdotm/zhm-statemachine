@@ -114,5 +114,5 @@ public abstract class AbstractTransition implements ITransition {
 
         return this.stateTo;
     }
-    
+
 }

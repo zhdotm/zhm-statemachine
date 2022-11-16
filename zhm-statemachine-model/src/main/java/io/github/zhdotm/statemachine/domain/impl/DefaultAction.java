@@ -17,6 +17,36 @@ public class DefaultAction implements IAction {
 
     private Function<Object[], Boolean> invoke;
 
+    public DefaultAction(String actionId, Function<Object[], Boolean> invoke) {
+        this.actionId = actionId;
+        this.invoke = invoke;
+    }
+
+    public DefaultAction() {
+    }
+
+    public static DefaultAction getInstance(String actionId, Function<Object[], Boolean> invoke) {
+
+        return new DefaultAction(actionId, invoke);
+    }
+
+    public static DefaultAction getInstance() {
+
+        return new DefaultAction();
+    }
+
+    public DefaultAction actionId(String actionId) {
+        this.actionId = actionId;
+
+        return this;
+    }
+
+    public DefaultAction invoke(Function<Object[], Boolean> invoke) {
+        this.invoke = invoke;
+
+        return this;
+    }
+
     @Override
     public String getActionId() {
         return actionId;
@@ -31,11 +61,6 @@ public class DefaultAction implements IAction {
     }
 
     public void setInvoke(Function<Object[], Boolean> invoke) {
-        this.invoke = invoke;
-    }
-
-    public DefaultAction(String actionId, Function<Object[], Boolean> invoke) {
-        this.actionId = actionId;
         this.invoke = invoke;
     }
 
