@@ -13,10 +13,10 @@ import io.github.zhdotm.statemachine.domain.IStateMachine;
  * @author zhihao.mao
  */
 
-public class StateMachineBuilderImpl<M, S, E> implements StateMachineBuilder<M, S, E> {
+public class StateMachineBuilderImpl<M, S, E, A> implements StateMachineBuilder<M, S, E, A> {
 
     @Override
-    public IStateMachine<M, S, E> build(M stateMachineId) {
+    public IStateMachine<M, S, E, A> build(M stateMachineId) {
 
         return null;
     }

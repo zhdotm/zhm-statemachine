@@ -12,7 +12,7 @@ import io.github.zhdotm.statemachine.domain.IStateMachine;
  * @author zhihao.mao
  */
 
-public interface StateMachineBuilder<M, S, E> {
+public interface StateMachineBuilder<M, S, E,A> {
 
     /**
      * 构件状态机
@@ -20,6 +20,6 @@ public interface StateMachineBuilder<M, S, E> {
      * @param stateMachineId 状态机ID
      * @return 状态机
      */
-    IStateMachine<M, S, E> build(M stateMachineId);
+    IStateMachine<M, S, E, A> build(M stateMachineId);
 
 }
