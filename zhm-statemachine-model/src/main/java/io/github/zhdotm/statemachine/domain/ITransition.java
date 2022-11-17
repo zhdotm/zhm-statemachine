@@ -1,9 +1,10 @@
 package io.github.zhdotm.statemachine.domain;
 
 
-import io.github.zhdotm.statemachine.annotation.Transition;
-import io.github.zhdotm.statemachine.constant.TransitionTypeEnum;
-import io.github.zhdotm.statemachine.exception.BizStateMachineException;
+import io.github.zhdotm.statemachine.exception.StateMachineException;
+import lombok.SneakyThrows;
+
+import java.util.Collection;
 
 /**
  * 转换
@@ -11,153 +12,60 @@ import io.github.zhdotm.statemachine.exception.BizStateMachineException;
  * @author zhihao.mao
  */
 
-public interface ITransition {
+public interface ITransition<S, E, A> {
 
     /**
-     * 转换类型
+     * 获取排序号
      *
-     * @param transitionTypeEnum 转换类型
-     * @return this
+     * @return 排序号
      */
-    ITransition type(TransitionTypeEnum transitionTypeEnum);
+    default Integer getSort() {
 
-    /**
-     * 来源状态
-     *
-     * @param state 来源状态
-     * @return this
-     */
-    ITransition from(IState state);
-
-    /**
-     * 前往状态
-     *
-     * @param state 前往状态
-     * @return this
-     */
-    ITransition to(IState state);
-
-    /**
-     * 条件
-     *
-     * @param condition 条件
-     * @return this
-     */
-    ITransition condition(ICondition condition);
-
-    /**
-     * 动作
-     *
-     * @param action 动作
-     * @return this
-     */
-    ITransition action(IAction action);
-
-    /**
-     * 排序号
-     *
-     * @param sortId 排序号
-     * @return this
-     */
-    ITransition sortId(Integer sortId);
-
-    /**
-     * 获取转换ID
-     *
-     * @return 转换ID
-     */
-    String getTransitionId();
-
-    /**
-     * 获取状态机ID
-     *
-     * @param stateMachineId 状态机ID
-     */
-    void setStateMachineId(String stateMachineId);
-
-    /**
-     * 获取状态机ID
-     *
-     * @return 状态机ID
-     */
-    String getStateMachineId();
-
-    /**
-     * 获取状态机ID
-     *
-     * @return 状态机ID
-     */
-    default String getStateMachineIdWithAnnotation() {
-        String stateMachineId = getStateMachineId();
-        if (null != stateMachineId && !"".equalsIgnoreCase(stateMachineId)) {
-
-            return stateMachineId;
-        }
-        Class<? extends ITransition> clazz = this.getClass();
-        Transition transition = clazz.getAnnotation(Transition.class);
-
-        return transition == null ? null : transition.stateMachineId();
+        return Integer.MAX_VALUE;
     }
 
     /**
-     * 获取排序ID(从小到大)
+     * 获取转换来源状态ID
      *
-     * @return 排序ID
+     * @return 转换来源状态ID
      */
-    Integer getSortId();
+    Collection<S> getFromStateIds();
 
     /**
-     * 获取转换类型
+     * 获取转换条件
      *
-     * @return 转换类型
+     * @return 转换条件
      */
-    TransitionTypeEnum getType();
-
-    /**
-     * 获取条件
-     *
-     * @return 条件
-     */
-    ICondition getCondition();
+    ICondition<S, E> getCondition();
 
     /**
      * 获取动作
      *
      * @return 动作
      */
-    IAction getAction();
+    IAction<A> getAction();
 
     /**
-     * 获取当前状态
+     * 获取转换成功后的状态ID
      *
-     * @return 触发转换的状态
+     * @return 状态ID
      */
-    IState getCurrentState();
+    S getToStateId();
 
-    /**
-     * 获取下个状态
-     *
-     * @return 新状态
-     */
-    IState getNextState();
+    @SneakyThrows
+    default S transfer(IEventContext<S, E> eventContext) {
+        ICondition<S, E> condition = getCondition();
+        if (!condition.isSatisfied(eventContext)) {
 
-    /**
-     * 转换
-     *
-     * @param args 动作参数
-     * @return 下个状态
-     * @throws BizStateMachineException 状态机业务异常
-     */
-    default IState transfer(Object... args) throws BizStateMachineException {
-        TransitionTypeEnum transitionType = getType();
-        IAction action = getAction();
-        Boolean invokeIsSuccess = action.invoke(args);
-        if (!invokeIsSuccess) {
-
-            throw new BizStateMachineException(String.format("transition[%s]执行失败: action[%s]执行失败", getTransitionId(), action.getActionId()));
+            throw new StateMachineException("执行转换失败: 条件未通过");
         }
 
-        return transitionType == TransitionTypeEnum.EXTERNAL ? getNextState() : getCurrentState();
-    }
+        IAction<A> action = getAction();
+        if (!action.invoke(eventContext.getEvent().getPayload())) {
 
+            throw new StateMachineException("执行转换失败: 执行动作失败");
+        }
+
+        return getToStateId();
+    }
 }

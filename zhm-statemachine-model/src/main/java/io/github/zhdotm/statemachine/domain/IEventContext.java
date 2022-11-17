@@ -1,33 +1,26 @@
 package io.github.zhdotm.statemachine.domain;
 
 /**
- * 事件上下文环境
+ * 事件上下文
  *
  * @author zhihao.mao
  */
 
-public interface IEventContext {
-    
-    /**
-     * 获取状态机ID
-     *
-     * @return 状态机ID
-     */
-    String getStateMachineId();
+public interface IEventContext<S, E> {
 
     /**
      * 获取状态ID
      *
      * @return 状态ID
      */
-    String getStateId();
+    S getStateId();
 
     /**
      * 获取事件
      *
      * @return 事件
      */
-    IEvent getEvent();
+    IEvent<E> getEvent();
 
 
 }

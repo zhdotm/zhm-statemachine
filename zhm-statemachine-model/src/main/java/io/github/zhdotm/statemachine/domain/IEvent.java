@@ -1,32 +1,20 @@
 package io.github.zhdotm.statemachine.domain;
 
 
-import io.github.zhdotm.statemachine.constant.EventTypeEnum;
-
 /**
  * 事件
  *
  * @author zhihao.mao
  */
 
-public interface IEvent {
-
-    /**
-     * 获取事件类型(默认常规类型)
-     *
-     * @return 事件类型
-     */
-    default EventTypeEnum getType() {
-
-        return EventTypeEnum.NORMAL;
-    }
+public interface IEvent<E> {
 
     /**
      * 获取事件ID
      *
      * @return 事件ID
      */
-    String getEventId();
+    E getEventId();
 
     /**
      * 获取参数负载
