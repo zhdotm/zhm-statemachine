@@ -5,7 +5,6 @@ import io.github.zhdotm.statemachine.support.builder.external.ExternalTransition
 import io.github.zhdotm.statemachine.support.builder.external.ExternalTransitionFromBuilder;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author zhihao.mao

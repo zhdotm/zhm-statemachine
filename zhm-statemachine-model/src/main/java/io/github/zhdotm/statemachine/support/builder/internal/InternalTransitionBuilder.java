@@ -1,6 +1,5 @@
 package io.github.zhdotm.statemachine.support.builder.internal;
 
-import java.util.List;
 
 /**
  * @author zhihao.mao

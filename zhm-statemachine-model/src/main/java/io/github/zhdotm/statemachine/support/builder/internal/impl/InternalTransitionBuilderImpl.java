@@ -5,7 +5,6 @@ import io.github.zhdotm.statemachine.support.builder.internal.InternalTransition
 import io.github.zhdotm.statemachine.support.builder.internal.InternalTransitionFromBuilder;
 
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author zhihao.mao
