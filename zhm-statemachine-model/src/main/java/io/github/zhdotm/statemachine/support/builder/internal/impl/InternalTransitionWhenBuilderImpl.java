@@ -22,7 +22,7 @@ public class InternalTransitionWhenBuilderImpl<S, E, C, A> implements InternalTr
     }
 
     @Override
-    public void perform(A actionId, Function<Object[], Boolean> execute) {
+    public void perform(A actionId, Function<Object[], Object> execute) {
         ActionImpl<A> action = ActionImpl.getInstance();
         action.actionId(actionId)
                 .execute(execute);
