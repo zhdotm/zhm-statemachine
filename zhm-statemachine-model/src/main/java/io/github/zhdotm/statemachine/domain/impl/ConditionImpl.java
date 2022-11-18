@@ -29,7 +29,7 @@ public class ConditionImpl<S, E, C> implements ICondition<S, E, C> {
     }
 
     public ConditionImpl<S, E, C> conditionId(C conditionId) {
-        this.check = check;
+        this.conditionId = conditionId;
 
         return this;
     }
