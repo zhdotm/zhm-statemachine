@@ -1,7 +1,9 @@
 package io.github.zhdotm.statemachine.domain.impl;
 
 import io.github.zhdotm.statemachine.constant.TransitionTypeEnum;
-import io.github.zhdotm.statemachine.domain.*;
+import io.github.zhdotm.statemachine.domain.IState;
+import io.github.zhdotm.statemachine.domain.IStateMachine;
+import io.github.zhdotm.statemachine.domain.ITransition;
 import io.github.zhdotm.statemachine.exception.StateMachineException;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,25 +15,22 @@ import java.util.*;
  * @author zhihao.mao
  */
 
-public class StateMachineImpl<M, S, E, A> implements IStateMachine<M, S, E, A> {
+public class StateMachineImpl<M, S, E, C, A> implements IStateMachine<M, S, E, C, A> {
 
+    private final Map<S, IState<S, E>> stateMap = new HashMap<>();
+    private final Map<String, ITransition<S, E, C, A>> externalTransitionMap = new HashMap<>();
+    private final Map<String, List<ITransition<S, E, C, A>>> internalTransitionMap = new HashMap<>();
     @Getter
     @Setter
     private M stateMachineId;
 
-    private final Map<S, IState<S, E>> stateMap = new HashMap<>();
-
-    private final Map<String, ITransition<S, E, A>> externalTransitionMap = new HashMap<>();
-
-    private final Map<String, List<ITransition<S, E, A>>> internalTransitionMap = new HashMap<>();
-
-    public static <M, S, E, A> StateMachineImpl<M, S, E, A> getInstance() {
+    public static <M, S, E, C, A> StateMachineImpl<M, S, E, C, A> getInstance() {
 
         return new StateMachineImpl<>();
     }
 
     @Override
-    public IStateMachine<M, S, E, A> stateMachineId(M stateMachineId) {
+    public IStateMachine<M, S, E, C, A> stateMachineId(M stateMachineId) {
         this.stateMachineId = stateMachineId;
 
         return this;
@@ -50,33 +49,33 @@ public class StateMachineImpl<M, S, E, A> implements IStateMachine<M, S, E, A> {
     }
 
     @Override
-    public ITransition<S, E, A> getExternalTransition(S stateId, E eventId) {
+    public ITransition<S, E, C, A> getExternalTransition(S stateId, E eventId) {
 
         return externalTransitionMap.get(stateId + "_" + eventId);
     }
 
     @Override
-    public List<ITransition<S, E, A>> getInternalTransition(S stateId, E eventId) {
+    public List<ITransition<S, E, C, A>> getInternalTransition(S stateId, E eventId) {
 
         return internalTransitionMap.get(stateId + "_" + eventId);
     }
 
     @Override
-    public void addTransitions(List<ITransition<S, E, A>> transitions) {
-        for (ITransition<S, E, A> transition : transitions) {
+    public void addTransitions(List<ITransition<S, E, C, A>> transitions) {
+        for (ITransition<S, E, C, A> transition : transitions) {
 
             addTransition(transition);
         }
     }
 
     @SneakyThrows
-    private void addTransition(ITransition<S, E, A> transition) {
+    private void addTransition(ITransition<S, E, C, A> transition) {
         TransitionTypeEnum type = transition.getType();
         Collection<S> fromStateIds = transition.getFromStateIds();
         E eventId = transition.getEventId();
         if (type == TransitionTypeEnum.EXTERNAL) {
             for (S fromStateId : fromStateIds) {
-                ITransition<S, E, A> externalTransition = getExternalTransition(fromStateId, eventId);
+                ITransition<S, E, C, A> externalTransition = getExternalTransition(fromStateId, eventId);
                 if (externalTransition != null) {
 
                     throw new StateMachineException(String.format("添加转换失败, 一个状态[%s]和事件[%s]确定的唯一外部转换已经存在", fromStateId, eventId));
@@ -95,7 +94,7 @@ public class StateMachineImpl<M, S, E, A> implements IStateMachine<M, S, E, A> {
                 externalTransitionMap.put(fromStateId + "_" + eventId, transition);
             }
             if (type == TransitionTypeEnum.INTERNAL) {
-                List<ITransition<S, E, A>> transitions = internalTransitionMap.getOrDefault(fromStateId + "_" + eventId, new ArrayList<>());
+                List<ITransition<S, E, C, A>> transitions = internalTransitionMap.getOrDefault(fromStateId + "_" + eventId, new ArrayList<>());
                 transitions.add(transition);
                 internalTransitionMap.put(fromStateId + "_" + eventId, transitions);
             }

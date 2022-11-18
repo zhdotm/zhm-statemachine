@@ -10,7 +10,7 @@ import io.github.zhdotm.statemachine.support.builder.StateMachineBuilderImpl;
 
 public class StateMachineFactory {
 
-    public static <M, S, E, A> StateMachineBuilder<M, S, E, A> create() {
+    public static <M, S, E, C, A> StateMachineBuilder<M, S, E, C, A> create() {
 
         return StateMachineBuilderImpl.getInstance();
     }

@@ -6,7 +6,7 @@ import java.util.function.Function;
  * @author zhihao.mao
  */
 
-public interface InternalTransitionWhenBuilder<S, E, A> {
+public interface InternalTransitionWhenBuilder<S, E, C, A> {
 
-    void perform(A actionId, Function<Object[], Boolean> doSomething);
+    void perform(A actionId, Function<Object[], Boolean> check);
 }

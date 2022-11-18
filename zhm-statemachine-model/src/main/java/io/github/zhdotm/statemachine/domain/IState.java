@@ -2,7 +2,6 @@ package io.github.zhdotm.statemachine.domain;
 
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author zhihao.mao

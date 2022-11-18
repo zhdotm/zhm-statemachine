@@ -10,27 +10,27 @@ import java.util.Arrays;
  * @author zhihao.mao
  */
 
-public class ExternalTransitionBuilderImpl<S, E, A> implements ExternalTransitionBuilder<S, E, A> {
+public class ExternalTransitionBuilderImpl<S, E, C, A> implements ExternalTransitionBuilder<S, E, C, A> {
 
-    private ITransition<S, E, A> transition;
+    private ITransition<S, E, C, A> transition;
 
-    public static <S, E, A> ExternalTransitionBuilderImpl<S, E, A> getInstance(ITransition<S, E, A> transition) {
+    public static <S, E, C, A> ExternalTransitionBuilderImpl<S, E, C, A> getInstance(ITransition<S, E, C, A> transition) {
 
-        ExternalTransitionBuilderImpl<S, E, A> transitionBuilder = new ExternalTransitionBuilderImpl<>();
+        ExternalTransitionBuilderImpl<S, E, C, A> transitionBuilder = new ExternalTransitionBuilderImpl<>();
         transitionBuilder.transition = transition;
 
         return transitionBuilder;
     }
 
     @Override
-    public ExternalTransitionBuilder<S, E, A> sort(Integer sort) {
+    public ExternalTransitionBuilder<S, E, C, A> sort(Integer sort) {
         transition.sort(sort);
 
         return this;
     }
 
     @Override
-    public ExternalTransitionFromBuilder<S, E, A> from(S... stateIds) {
+    public ExternalTransitionFromBuilder<S, E, C, A> from(S... stateIds) {
         transition.from(Arrays.asList(stateIds));
 
         return ExternalTransitionFromBuilderImpl.getInstance(transition);

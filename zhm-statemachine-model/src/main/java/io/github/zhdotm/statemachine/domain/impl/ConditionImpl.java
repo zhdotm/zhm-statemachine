@@ -2,6 +2,7 @@ package io.github.zhdotm.statemachine.domain.impl;
 
 import io.github.zhdotm.statemachine.domain.ICondition;
 import io.github.zhdotm.statemachine.domain.IEventContext;
+import lombok.Getter;
 
 import java.util.function.Function;
 
@@ -9,17 +10,26 @@ import java.util.function.Function;
  * @author zhihao.mao
  */
 
-public class ConditionImpl<S, E> implements ICondition<S, E> {
+public class ConditionImpl<S, E, C> implements ICondition<S, E, C> {
 
-    private Function<IEventContext<S, E>, Boolean> doCondition;
+    private Function<IEventContext<S, E>, Boolean> check;
 
-    public static <S, E> ConditionImpl<S, E> getInstance() {
+    @Getter
+    private C conditionId;
+
+    public static <S, E, C> ConditionImpl<S, E, C> getInstance() {
 
         return new ConditionImpl<>();
     }
 
-    public ConditionImpl<S, E> check(Function<IEventContext<S, E>, Boolean> doCondition) {
-        this.doCondition = doCondition;
+    public ConditionImpl<S, E, C> check(Function<IEventContext<S, E>, Boolean> check) {
+        this.check = check;
+
+        return this;
+    }
+
+    public ConditionImpl<S, E, C> conditionId(C conditionId) {
+        this.check = check;
 
         return this;
     }
@@ -27,7 +37,7 @@ public class ConditionImpl<S, E> implements ICondition<S, E> {
     @Override
     public Boolean isSatisfied(IEventContext<S, E> eventContext) {
 
-        return doCondition.apply(eventContext);
+        return check.apply(eventContext);
     }
 
 }

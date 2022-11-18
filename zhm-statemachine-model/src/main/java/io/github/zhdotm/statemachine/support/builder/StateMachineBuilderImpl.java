@@ -19,20 +19,20 @@ import java.util.List;
  * @author zhihao.mao
  */
 
-public class StateMachineBuilderImpl<M, S, E, A> implements StateMachineBuilder<M, S, E, A> {
+public class StateMachineBuilderImpl<M, S, E, C, A> implements StateMachineBuilder<M, S, E, C, A> {
 
-    private final StateMachineImpl<M, S, E, A> stateMachine = StateMachineImpl.getInstance();
+    private final StateMachineImpl<M, S, E, C, A> stateMachine = StateMachineImpl.getInstance();
 
-    private final List<ITransition<S, E, A>> transitions = new ArrayList<>();
+    private final List<ITransition<S, E, C, A>> transitions = new ArrayList<>();
 
-    public static <M, S, E, A> StateMachineBuilderImpl<M, S, E, A> getInstance() {
+    public static <M, S, E, C, A> StateMachineBuilderImpl<M, S, E, C, A> getInstance() {
 
         return new StateMachineBuilderImpl<>();
     }
 
     @Override
-    public ExternalTransitionBuilder<S, E, A> createExternalTransition() {
-        TransitionImpl<S, E, A> transition = TransitionImpl.getInstance();
+    public ExternalTransitionBuilder<S, E, C, A> createExternalTransition() {
+        TransitionImpl<S, E, C, A> transition = TransitionImpl.getInstance();
         transition.type(TransitionTypeEnum.EXTERNAL);
         transitions.add(transition);
 
@@ -40,8 +40,8 @@ public class StateMachineBuilderImpl<M, S, E, A> implements StateMachineBuilder<
     }
 
     @Override
-    public InternalTransitionBuilder<S, E, A> createInternalTransition() {
-        TransitionImpl<S, E, A> transition = TransitionImpl.getInstance();
+    public InternalTransitionBuilder<S, E, C, A> createInternalTransition() {
+        TransitionImpl<S, E, C, A> transition = TransitionImpl.getInstance();
         transition.type(TransitionTypeEnum.INTERNAL);
         transitions.add(transition);
 
@@ -49,7 +49,7 @@ public class StateMachineBuilderImpl<M, S, E, A> implements StateMachineBuilder<
     }
 
     @Override
-    public IStateMachine<M, S, E, A> build(M stateMachineId) {
+    public IStateMachine<M, S, E, C, A> build(M stateMachineId) {
         stateMachine.stateMachineId(stateMachineId);
         stateMachine.addTransitions(transitions);
 

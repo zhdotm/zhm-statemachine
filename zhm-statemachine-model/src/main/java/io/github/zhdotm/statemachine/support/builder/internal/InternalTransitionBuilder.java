@@ -5,9 +5,9 @@ package io.github.zhdotm.statemachine.support.builder.internal;
  * @author zhihao.mao
  */
 
-public interface InternalTransitionBuilder<S, E, A> {
+public interface InternalTransitionBuilder<S, E, C, A> {
 
-    InternalTransitionBuilder<S, E, A> sort(Integer sort);
+    InternalTransitionBuilder<S, E, C, A> sort(Integer sort);
 
-    InternalTransitionFromBuilder<S, E, A> from(S... stateIds);
+    InternalTransitionFromBuilder<S, E, C, A> from(S... stateIds);
 }

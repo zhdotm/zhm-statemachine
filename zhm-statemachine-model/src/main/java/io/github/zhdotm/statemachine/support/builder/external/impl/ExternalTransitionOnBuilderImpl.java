@@ -12,21 +12,22 @@ import java.util.function.Function;
  * @author zhihao.mao
  */
 
-public class ExternalTransitionOnBuilderImpl<S, E, A> implements ExternalTransitionOnBuilder<S, E, A> {
+public class ExternalTransitionOnBuilderImpl<S, E, C, A> implements ExternalTransitionOnBuilder<S, E, C, A> {
 
-    private ITransition<S, E, A> transition;
+    private ITransition<S, E, C, A> transition;
 
-    public static <S, E, A> ExternalTransitionOnBuilderImpl<S, E, A> getInstance(ITransition<S, E, A> transition) {
-        ExternalTransitionOnBuilderImpl<S, E, A> transitionOnBuilder = new ExternalTransitionOnBuilderImpl<>();
+    public static <S, E, C, A> ExternalTransitionOnBuilderImpl<S, E, C, A> getInstance(ITransition<S, E, C, A> transition) {
+        ExternalTransitionOnBuilderImpl<S, E, C, A> transitionOnBuilder = new ExternalTransitionOnBuilderImpl<>();
         transitionOnBuilder.transition = transition;
 
         return transitionOnBuilder;
     }
 
     @Override
-    public ExternalTransitionWhenBuilder<S, E, A> when(Function<IEventContext<S, E>, Boolean> check) {
-        ConditionImpl<S, E> condition = ConditionImpl.getInstance();
-        condition.check(check);
+    public ExternalTransitionWhenBuilder<S, E, C, A> when(C conditionId, Function<IEventContext<S, E>, Boolean> check) {
+        ConditionImpl<S, E, C> condition = ConditionImpl.getInstance();
+        condition.conditionId(conditionId)
+                .check(check);
         transition.when(condition);
 
         return ExternalTransitionWhenBuilderImpl.getInstance(transition);

@@ -8,13 +8,13 @@ import io.github.zhdotm.statemachine.support.builder.internal.InternalTransition
  * @author zhihao.mao
  */
 
-public class InternalTransitionFromBuilderImpl<S, E, A> implements InternalTransitionFromBuilder<S, E, A> {
+public class InternalTransitionFromBuilderImpl<S, E, C, A> implements InternalTransitionFromBuilder<S, E, C, A> {
 
-    private ITransition<S, E, A> transition;
+    private ITransition<S, E, C, A> transition;
 
-    public static <S, E, A> InternalTransitionFromBuilderImpl<S, E, A> getInstance(ITransition<S, E, A> transition) {
+    public static <S, E, C, A> InternalTransitionFromBuilderImpl<S, E, C, A> getInstance(ITransition<S, E, C, A> transition) {
 
-        InternalTransitionFromBuilderImpl<S, E, A> transitionFromBuilder = new InternalTransitionFromBuilderImpl<>();
+        InternalTransitionFromBuilderImpl<S, E, C, A> transitionFromBuilder = new InternalTransitionFromBuilderImpl<>();
 
         transitionFromBuilder.transition = transition;
 
@@ -22,7 +22,7 @@ public class InternalTransitionFromBuilderImpl<S, E, A> implements InternalTrans
     }
 
     @Override
-    public InternalTransitionOnBuilder<S, E, A> on(E eventId) {
+    public InternalTransitionOnBuilder<S, E, C, A> on(E eventId) {
         transition.on(eventId);
 
         return InternalTransitionOnBuilderImpl.getInstance(transition);

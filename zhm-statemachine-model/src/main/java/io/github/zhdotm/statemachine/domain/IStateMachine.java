@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  * @author zhihao.mao
  */
 
-public interface IStateMachine<M, S, E, A> {
+public interface IStateMachine<M, S, E, C, A> {
 
     /**
      * 获取状态机ID
@@ -26,7 +26,7 @@ public interface IStateMachine<M, S, E, A> {
      * @param stateMachineId 状态机ID
      * @return 状态机
      */
-    IStateMachine<M, S, E, A> stateMachineId(M stateMachineId);
+    IStateMachine<M, S, E, C, A> stateMachineId(M stateMachineId);
 
     /**
      * 获取所有状态ID
@@ -50,7 +50,7 @@ public interface IStateMachine<M, S, E, A> {
      * @param eventId 事件ID
      * @return 转换
      */
-    ITransition<S, E, A> getExternalTransition(S stateId, E eventId);
+    ITransition<S, E, C, A> getExternalTransition(S stateId, E eventId);
 
     /**
      * 获取内部转换
@@ -59,14 +59,14 @@ public interface IStateMachine<M, S, E, A> {
      * @param eventId 事件ID
      * @return 转换
      */
-    List<ITransition<S, E, A>> getInternalTransition(S stateId, E eventId);
+    List<ITransition<S, E, C, A>> getInternalTransition(S stateId, E eventId);
 
     /**
      * 添加转换
      *
      * @param transitions 添加转换
      */
-    void addTransitions(List<ITransition<S, E, A>> transitions);
+    void addTransitions(List<ITransition<S, E, C, A>> transitions);
 
     /**
      * 发布事件
@@ -92,16 +92,16 @@ public interface IStateMachine<M, S, E, A> {
             throw new StateMachineException(String.format("发布事件[%s]失败: 对应状态[%s]不存在指定事件[%S]", eventId, stateId, eventId));
         }
 
-        List<ITransition<S, E, A>> internalTransitions = Optional.ofNullable(getInternalTransition(stateId, eventId))
+        List<ITransition<S, E, C, A>> internalTransitions = Optional.ofNullable(getInternalTransition(stateId, eventId))
                 .orElse(new ArrayList<>())
                 .stream()
                 .sorted(Comparator.comparingInt(ITransition::getSort))
                 .collect(Collectors.toList());
-        for (ITransition<S, E, A> internalTransition : internalTransitions) {
+        for (ITransition<S, E, C, A> internalTransition : internalTransitions) {
             internalTransition.transfer(eventContext);
         }
 
-        ITransition<S, E, A> externalTransition = getExternalTransition(stateId, eventId);
+        ITransition<S, E, C, A> externalTransition = getExternalTransition(stateId, eventId);
         if (externalTransition == null) {
 
             return stateId;

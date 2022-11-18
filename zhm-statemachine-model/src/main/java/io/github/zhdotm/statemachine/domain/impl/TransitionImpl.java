@@ -6,23 +6,22 @@ import io.github.zhdotm.statemachine.domain.ICondition;
 import io.github.zhdotm.statemachine.domain.ITransition;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * @author zhihao.mao
  */
 
-public class TransitionImpl<S, E, A> implements ITransition<S, E, A> {
-
-    @Getter
-    private TransitionTypeEnum type;
-
-    @Getter
-    private Integer sort = Integer.MAX_VALUE;
+public class TransitionImpl<S, E, C, A> implements ITransition<S, E, C, A> {
 
     @Getter
     private final Collection<S> fromStateIds = new HashSet<>();
-
+    @Getter
+    private TransitionTypeEnum type;
+    @Getter
+    private Integer sort = Integer.MAX_VALUE;
     @Getter
     private S toStateId;
 
@@ -30,60 +29,60 @@ public class TransitionImpl<S, E, A> implements ITransition<S, E, A> {
     private E eventId;
 
     @Getter
-    private ICondition<S, E> condition;
+    private ICondition<S, E, C> condition;
 
     @Getter
     private IAction<A> action;
 
-    public static <S, E, A> TransitionImpl<S, E, A> getInstance() {
+    public static <S, E, C, A> TransitionImpl<S, E, C, A> getInstance() {
 
         return new TransitionImpl<>();
     }
 
     @Override
-    public ITransition<S, E, A> type(TransitionTypeEnum type) {
+    public ITransition<S, E, C, A> type(TransitionTypeEnum type) {
         this.type = type;
 
         return this;
     }
 
     @Override
-    public ITransition<S, E, A> sort(Integer sort) {
+    public ITransition<S, E, C, A> sort(Integer sort) {
         this.sort = sort;
 
         return this;
     }
 
     @Override
-    public TransitionImpl<S, E, A> from(List<S> stateIds) {
+    public TransitionImpl<S, E, C, A> from(List<S> stateIds) {
         fromStateIds.addAll(stateIds);
 
         return this;
     }
 
     @Override
-    public ITransition<S, E, A> on(E eventId) {
+    public ITransition<S, E, C, A> on(E eventId) {
         this.eventId = eventId;
 
         return this;
     }
 
     @Override
-    public ITransition<S, E, A> to(S stateId) {
+    public ITransition<S, E, C, A> to(S stateId) {
         toStateId = stateId;
 
         return this;
     }
 
     @Override
-    public TransitionImpl<S, E, A> when(ICondition<S, E> condition) {
+    public TransitionImpl<S, E, C, A> when(ICondition<S, E, C> condition) {
         this.condition = condition;
 
         return this;
     }
 
     @Override
-    public TransitionImpl<S, E, A> perform(IAction<A> action) {
+    public TransitionImpl<S, E, C, A> perform(IAction<A> action) {
         this.action = action;
 
         return this;

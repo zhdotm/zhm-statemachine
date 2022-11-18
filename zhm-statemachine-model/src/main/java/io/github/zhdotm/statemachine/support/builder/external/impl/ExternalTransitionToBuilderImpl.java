@@ -7,13 +7,13 @@ import io.github.zhdotm.statemachine.support.builder.external.ExternalTransition
  * @author zhihao.mao
  */
 
-public class ExternalTransitionToBuilderImpl<S, E, A> implements ExternalTransitionToBuilder<S, E, A> {
+public class ExternalTransitionToBuilderImpl<S, E, C, A> implements ExternalTransitionToBuilder<S, E, C, A> {
 
-    private ITransition<S, E, A> transition;
+    private ITransition<S, E, C, A> transition;
 
-    public static <S, E, A> ExternalTransitionToBuilderImpl<S, E, A> getInstance(ITransition<S, E, A> transition) {
+    public static <S, E, C, A> ExternalTransitionToBuilderImpl<S, E, C, A> getInstance(ITransition<S, E, C, A> transition) {
 
-        ExternalTransitionToBuilderImpl<S, E, A> toBuilder = new ExternalTransitionToBuilderImpl<>();
+        ExternalTransitionToBuilderImpl<S, E, C, A> toBuilder = new ExternalTransitionToBuilderImpl<>();
         toBuilder.transition = transition;
 
         return toBuilder;

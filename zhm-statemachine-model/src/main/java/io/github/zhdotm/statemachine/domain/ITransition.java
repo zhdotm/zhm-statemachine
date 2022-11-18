@@ -12,7 +12,7 @@ import java.util.List;
  * @author zhihao.mao
  */
 
-public interface ITransition<S, E, A> {
+public interface ITransition<S, E, C, A> {
 
     /**
      * 获取转换类型
@@ -27,7 +27,7 @@ public interface ITransition<S, E, A> {
      * @param type 类型
      * @return 转换
      */
-    ITransition<S, E, A> type(TransitionTypeEnum type);
+    ITransition<S, E, C, A> type(TransitionTypeEnum type);
 
     /**
      * 获取排序号
@@ -42,7 +42,7 @@ public interface ITransition<S, E, A> {
      * @param sort 排序号
      * @return 转换
      */
-    ITransition<S, E, A> sort(Integer sort);
+    ITransition<S, E, C, A> sort(Integer sort);
 
     /**
      * 获取转换来源状态ID
@@ -57,7 +57,7 @@ public interface ITransition<S, E, A> {
      * @param stateIds 初始状态
      * @return 转换
      */
-    ITransition<S, E, A> from(List<S> stateIds);
+    ITransition<S, E, C, A> from(List<S> stateIds);
 
     /**
      * 获取事件ID
@@ -72,14 +72,14 @@ public interface ITransition<S, E, A> {
      * @param eventId 事件ID
      * @return 转换
      */
-    ITransition<S, E, A> on(E eventId);
+    ITransition<S, E, C, A> on(E eventId);
 
     /**
      * 获取转换条件
      *
      * @return 转换条件
      */
-    ICondition<S, E> getCondition();
+    ICondition<S, E, C> getCondition();
 
     /**
      * 设置条件
@@ -87,7 +87,7 @@ public interface ITransition<S, E, A> {
      * @param condition 条件
      * @return 转换
      */
-    ITransition<S, E, A> when(ICondition<S, E> condition);
+    ITransition<S, E, C, A> when(ICondition<S, E, C> condition);
 
     /**
      * 获取动作
@@ -102,7 +102,7 @@ public interface ITransition<S, E, A> {
      * @param action 动作
      * @return 转换
      */
-    ITransition<S, E, A> perform(IAction<A> action);
+    ITransition<S, E, C, A> perform(IAction<A> action);
 
     /**
      * 获取转换成功后的状态ID
@@ -117,11 +117,11 @@ public interface ITransition<S, E, A> {
      * @param stateId 状态ID
      * @return 转换
      */
-    ITransition<S, E, A> to(S stateId);
+    ITransition<S, E, C, A> to(S stateId);
 
     @SneakyThrows
     default S transfer(IEventContext<S, E> eventContext) {
-        ICondition<S, E> condition = getCondition();
+        ICondition<S, E, C> condition = getCondition();
         if (!condition.isSatisfied(eventContext)) {
 
             throw new StateMachineException("执行转换失败: 条件未通过");

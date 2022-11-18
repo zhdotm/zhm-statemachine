@@ -9,21 +9,21 @@ import io.github.zhdotm.statemachine.support.builder.internal.InternalTransition
  * @author zhihao.mao
  */
 
-public interface StateMachineBuilder<M, S, E, A> {
+public interface StateMachineBuilder<M, S, E, C, A> {
 
     /**
      * 创建外部转换构建器
      *
      * @return 外部转换构建器
      */
-    ExternalTransitionBuilder<S, E, A> createExternalTransition();
+    ExternalTransitionBuilder<S, E, C, A> createExternalTransition();
 
     /**
      * 创建内部转换构建器
      *
      * @return 内部转换构建器
      */
-    InternalTransitionBuilder<S, E, A> createInternalTransition();
+    InternalTransitionBuilder<S, E, C, A> createInternalTransition();
 
     /**
      * 构件状态机
@@ -31,6 +31,6 @@ public interface StateMachineBuilder<M, S, E, A> {
      * @param stateMachineId 状态机ID
      * @return 状态机
      */
-    IStateMachine<M, S, E, A> build(M stateMachineId);
+    IStateMachine<M, S, E, C, A> build(M stateMachineId);
 
 }

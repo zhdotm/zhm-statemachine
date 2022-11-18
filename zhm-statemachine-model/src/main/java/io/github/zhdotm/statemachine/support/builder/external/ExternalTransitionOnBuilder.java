@@ -8,8 +8,8 @@ import java.util.function.Function;
  * @author zhihao.mao
  */
 
-public interface ExternalTransitionOnBuilder<S, E, A> {
+public interface ExternalTransitionOnBuilder<S, E, C, A> {
 
-    ExternalTransitionWhenBuilder<S, E, A> when(Function<IEventContext<S, E>, Boolean> check);
+    ExternalTransitionWhenBuilder<S, E, C, A> when(C conditionId, Function<IEventContext<S, E>, Boolean> check);
 
 }

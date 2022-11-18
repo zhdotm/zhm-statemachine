@@ -6,7 +6,7 @@ import java.util.function.Function;
  * @author zhihao.mao
  */
 
-public interface ExternalTransitionWhenBuilder<S, E, A> {
+public interface ExternalTransitionWhenBuilder<S, E, C, A> {
 
-    ExternalTransitionToBuilder<S, E, A> perform(A actionId, Function<Object[], Boolean> doSomething);
+    ExternalTransitionToBuilder<S, E, C, A> perform(A actionId, Function<Object[], Boolean> doSomething);
 }
