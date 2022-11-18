@@ -14,7 +14,7 @@ public class ActionImpl<A> implements IAction<A> {
     @Getter
     private A actionId;
 
-    private Function<Object[], Boolean> doAction;
+    private Function<Object[], Boolean> execute;
 
     public static <A> ActionImpl<A> getInstance() {
 
@@ -27,8 +27,8 @@ public class ActionImpl<A> implements IAction<A> {
         return this;
     }
 
-    public ActionImpl<A> doAction(Function<Object[], Boolean> doAction) {
-        this.doAction = doAction;
+    public ActionImpl<A> execute(Function<Object[], Boolean> execute) {
+        this.execute = execute;
 
         return this;
     }
@@ -37,6 +37,6 @@ public class ActionImpl<A> implements IAction<A> {
     public Boolean invoke(Object... args) {
 
 
-        return doAction.apply(args);
+        return execute.apply(args);
     }
 }

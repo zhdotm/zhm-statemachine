@@ -26,7 +26,7 @@ public class ExternalTransitionOnBuilderImpl<S, E, A> implements ExternalTransit
     @Override
     public ExternalTransitionWhenBuilder<S, E, A> when(Function<IEventContext<S, E>, Boolean> check) {
         ConditionImpl<S, E> condition = ConditionImpl.getInstance();
-        condition.doCondition(check);
+        condition.check(check);
         transition.when(condition);
 
         return ExternalTransitionWhenBuilderImpl.getInstance(transition);

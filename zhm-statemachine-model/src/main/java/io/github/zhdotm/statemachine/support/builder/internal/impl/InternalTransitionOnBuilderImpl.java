@@ -26,7 +26,7 @@ public class InternalTransitionOnBuilderImpl<S, E, A> implements InternalTransit
     @Override
     public InternalTransitionWhenBuilder<S, E, A> when(Function<IEventContext<S, E>, Boolean> check) {
         ConditionImpl<S, E> condition = ConditionImpl.getInstance();
-        condition.doCondition(check);
+        condition.check(check);
         transition.when(condition);
 
         return InternalTransitionWhenBuilderImpl.getInstance(transition);

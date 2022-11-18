@@ -18,7 +18,7 @@ public class ConditionImpl<S, E> implements ICondition<S, E> {
         return new ConditionImpl<>();
     }
 
-    public ConditionImpl<S, E> doCondition(Function<IEventContext<S, E>, Boolean> doCondition) {
+    public ConditionImpl<S, E> check(Function<IEventContext<S, E>, Boolean> doCondition) {
         this.doCondition = doCondition;
 
         return this;
