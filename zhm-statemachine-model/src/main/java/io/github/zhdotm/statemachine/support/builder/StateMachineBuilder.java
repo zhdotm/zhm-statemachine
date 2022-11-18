@@ -2,17 +2,28 @@ package io.github.zhdotm.statemachine.support.builder;
 
 
 import io.github.zhdotm.statemachine.domain.IStateMachine;
+import io.github.zhdotm.statemachine.support.builder.external.ExternalTransitionBuilder;
+import io.github.zhdotm.statemachine.support.builder.internal.InternalTransitionBuilder;
 
 /**
- * 状态机构造器
- *
- * @param <M> 状态机ID类型
- * @param <S> 状态ID类型
- * @param <E> 事件ID类型
  * @author zhihao.mao
  */
 
-public interface StateMachineBuilder<M, S, E,A> {
+public interface StateMachineBuilder<M, S, E, A> {
+
+    /**
+     * 创建外部转换构建器
+     *
+     * @return 外部转换构建器
+     */
+    ExternalTransitionBuilder<S, E, A> createExternalTransition();
+
+    /**
+     * 创建内部转换构建器
+     *
+     * @return 内部转换构建器
+     */
+    InternalTransitionBuilder<S, E, A> createInternalTransition();
 
     /**
      * 构件状态机

@@ -4,6 +4,10 @@ import io.github.zhdotm.statemachine.domain.IEvent;
 import io.github.zhdotm.statemachine.domain.IEventContext;
 import lombok.Getter;
 
+/**
+ * @author zhihao.mao
+ */
+
 public class EventContextImpl<S, E> implements IEventContext<S, E> {
 
     @Getter
@@ -28,5 +32,5 @@ public class EventContextImpl<S, E> implements IEventContext<S, E> {
 
         return this;
     }
-    
+
 }

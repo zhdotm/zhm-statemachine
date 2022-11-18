@@ -2,8 +2,6 @@ package io.github.zhdotm.statemachine.domain;
 
 
 /**
- * 动作
- *
  * @author zhihao.mao
  */
 

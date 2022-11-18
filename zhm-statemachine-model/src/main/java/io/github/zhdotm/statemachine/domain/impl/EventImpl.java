@@ -3,6 +3,10 @@ package io.github.zhdotm.statemachine.domain.impl;
 import io.github.zhdotm.statemachine.domain.IEvent;
 import lombok.Getter;
 
+/**
+ * @author zhihao.mao
+ */
+
 public class EventImpl<E> implements IEvent<E> {
 
     @Getter
@@ -27,5 +31,5 @@ public class EventImpl<E> implements IEvent<E> {
 
         return this;
     }
-    
+
 }

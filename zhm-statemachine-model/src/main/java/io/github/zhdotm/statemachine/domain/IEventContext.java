@@ -1,8 +1,6 @@
 package io.github.zhdotm.statemachine.domain;
 
 /**
- * 事件上下文
- *
  * @author zhihao.mao
  */
 

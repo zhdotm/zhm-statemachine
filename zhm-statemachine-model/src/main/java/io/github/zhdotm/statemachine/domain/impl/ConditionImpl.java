@@ -5,6 +5,10 @@ import io.github.zhdotm.statemachine.domain.IEventContext;
 
 import java.util.function.Function;
 
+/**
+ * @author zhihao.mao
+ */
+
 public class ConditionImpl<S, E> implements ICondition<S, E> {
 
     private Function<IEventContext<S, E>, Boolean> doCondition;

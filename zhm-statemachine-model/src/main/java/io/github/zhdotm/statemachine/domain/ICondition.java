@@ -2,11 +2,10 @@ package io.github.zhdotm.statemachine.domain;
 
 
 /**
- * 条件
- *
  * @author zhihao.mao
  */
 
+@FunctionalInterface
 public interface ICondition<S, E> {
 
     /**

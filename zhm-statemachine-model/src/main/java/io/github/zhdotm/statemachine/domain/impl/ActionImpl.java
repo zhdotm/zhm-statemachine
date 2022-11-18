@@ -5,6 +5,10 @@ import lombok.Getter;
 
 import java.util.function.Function;
 
+/**
+ * @author zhihao.mao
+ */
+
 public class ActionImpl<A> implements IAction<A> {
 
     @Getter
