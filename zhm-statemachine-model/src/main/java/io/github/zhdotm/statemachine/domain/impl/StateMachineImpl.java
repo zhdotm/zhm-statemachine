@@ -4,7 +4,6 @@ import io.github.zhdotm.statemachine.constant.TransitionTypeEnum;
 import io.github.zhdotm.statemachine.domain.IState;
 import io.github.zhdotm.statemachine.domain.IStateMachine;
 import io.github.zhdotm.statemachine.domain.ITransition;
-import io.github.zhdotm.statemachine.exception.StateMachineException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -18,7 +17,7 @@ import java.util.*;
 public class StateMachineImpl<M, S, E, C, A> implements IStateMachine<M, S, E, C, A> {
 
     private final Map<S, IState<S, E>> stateMap = new HashMap<>();
-    private final Map<String, ITransition<S, E, C, A>> externalTransitionMap = new HashMap<>();
+    private final Map<String, List<ITransition<S, E, C, A>>> externalTransitionMap = new HashMap<>();
     private final Map<String, List<ITransition<S, E, C, A>>> internalTransitionMap = new HashMap<>();
     @Getter
     @Setter
@@ -49,7 +48,7 @@ public class StateMachineImpl<M, S, E, C, A> implements IStateMachine<M, S, E, C
     }
 
     @Override
-    public ITransition<S, E, C, A> getExternalTransition(S stateId, E eventId) {
+    public List<ITransition<S, E, C, A>> getExternalTransition(S stateId, E eventId) {
 
         return externalTransitionMap.get(stateId + "_" + eventId);
     }
@@ -73,16 +72,6 @@ public class StateMachineImpl<M, S, E, C, A> implements IStateMachine<M, S, E, C
         TransitionTypeEnum type = transition.getType();
         Collection<S> fromStateIds = transition.getFromStateIds();
         E eventId = transition.getEventId();
-        if (type == TransitionTypeEnum.EXTERNAL) {
-            for (S fromStateId : fromStateIds) {
-                ITransition<S, E, C, A> externalTransition = getExternalTransition(fromStateId, eventId);
-                if (externalTransition != null) {
-
-                    throw new StateMachineException(String.format("添加转换失败, 一个状态[%s]和事件[%s]确定的唯一外部转换已经存在", fromStateId, eventId));
-                }
-            }
-        }
-
         for (S fromStateId : fromStateIds) {
             IState<S, E> state = getState(fromStateId);
             if (state == null) {
@@ -90,14 +79,20 @@ public class StateMachineImpl<M, S, E, C, A> implements IStateMachine<M, S, E, C
             }
             state.addEventId(eventId);
             stateMap.put(fromStateId, state);
+
+            Map<String, List<ITransition<S, E, C, A>>> transitionMap = null;
             if (type == TransitionTypeEnum.EXTERNAL) {
-                externalTransitionMap.put(fromStateId + "_" + eventId, transition);
+
+                transitionMap = externalTransitionMap;
             }
             if (type == TransitionTypeEnum.INTERNAL) {
-                List<ITransition<S, E, C, A>> transitions = internalTransitionMap.getOrDefault(fromStateId + "_" + eventId, new ArrayList<>());
-                transitions.add(transition);
-                internalTransitionMap.put(fromStateId + "_" + eventId, transitions);
+
+                transitionMap = internalTransitionMap;
             }
+
+            List<ITransition<S, E, C, A>> transitions = transitionMap.getOrDefault(fromStateId + "_" + eventId, new ArrayList<>());
+            transitions.add(transition);
+            internalTransitionMap.put(fromStateId + "_" + eventId, transitions);
         }
     }
 

@@ -2,6 +2,8 @@ package io.github.zhdotm.statemachine.domain;
 
 
 import io.github.zhdotm.statemachine.exception.StateMachineException;
+import io.github.zhdotm.statemachine.exception.util.ExceptionUtil;
+import io.github.zhdotm.statemachine.log.ProcessLog;
 import lombok.SneakyThrows;
 
 import java.util.*;
@@ -12,6 +14,8 @@ import java.util.stream.Collectors;
  */
 
 public interface IStateMachine<M, S, E, C, A> {
+
+    ThreadLocal<String> STATEMACHINE_ID_THREAD_LOCAL = new ThreadLocal<>();
 
     /**
      * 获取状态机ID
@@ -50,7 +54,7 @@ public interface IStateMachine<M, S, E, C, A> {
      * @param eventId 事件ID
      * @return 转换
      */
-    ITransition<S, E, C, A> getExternalTransition(S stateId, E eventId);
+    List<ITransition<S, E, C, A>> getExternalTransition(S stateId, E eventId);
 
     /**
      * 获取内部转换
@@ -75,38 +79,51 @@ public interface IStateMachine<M, S, E, C, A> {
      * @return 转换成功后的状态ID
      */
     @SneakyThrows
-    default S fireEvent(IEventContext<S, E> eventContext) {
-        S stateId = eventContext.getStateId();
-        IEvent<E> event = eventContext.getEvent();
-        E eventId = event.getEventId();
+    default IStateContext<S, E> fireEvent(IEventContext<S, E> eventContext) {
+        STATEMACHINE_ID_THREAD_LOCAL.set(getStateMachineId().toString());
+        IStateContext<S, E> stateContext = null;
+        try {
+            S stateId = eventContext.getStateId();
+            IEvent<E> event = eventContext.getEvent();
+            E eventId = event.getEventId();
+            Object[] payload = event.getPayload();
 
-        IState<S, E> state = getState(stateId);
-        if (state == null) {
+            ProcessLog.info(String.format("流程日志[%s]: 状态[%s]收到触发事件[%s]携带负载[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload)));
 
-            throw new StateMachineException(String.format("发布事件[%s]失败: 不存在对应的状态[%s]", eventId, stateId));
+            IState<S, E> state = getState(stateId);
+            ExceptionUtil.isTrue(state != null, StateMachineException.class, String.format("发布事件[%s]失败: 不存在对应的状态[%s]", eventId, stateId));
+
+            Collection<E> eventIds = state.getEventIds();
+            ExceptionUtil.isTrue(eventIds.contains(eventId), StateMachineException.class, String.format("发布事件[%s]失败: 对应状态[%s]不存在指定事件[%S]", eventId, stateId, eventId));
+
+            List<ITransition<S, E, C, A>> satisfiedInternalTransitions = Optional.ofNullable(getInternalTransition(stateId, eventId))
+                    .orElse(new ArrayList<>())
+                    .stream()
+                    .filter(transition -> transition.getCondition().isSatisfied(eventContext))
+                    .sorted(Comparator.comparingInt(ITransition::getSort))
+                    .collect(Collectors.toList());
+
+            List<ITransition<S, E, C, A>> satisfiedExternalTransitions = Optional.ofNullable(getExternalTransition(stateId, eventId))
+                    .orElse(new ArrayList<>())
+                    .stream()
+                    .filter(transition -> transition.getCondition().isSatisfied(eventContext))
+                    .collect(Collectors.toList());
+
+            ExceptionUtil.isTrue(satisfiedExternalTransitions.size() <= 1, StateMachineException.class, String.format("发布事件[%s]失败: 状态[%s]指定事件[%S]对应的符合条件的外部转换超过一个", eventId, stateId, eventId));
+
+            for (ITransition<S, E, C, A> internalTransition : satisfiedInternalTransitions) {
+                stateContext = internalTransition.transfer(eventContext);
+            }
+            
+            for (ITransition<S, E, C, A> satisfiedExternalTransition : satisfiedExternalTransitions) {
+
+                stateContext = satisfiedExternalTransition.transfer(eventContext);
+            }
+        } finally {
+            STATEMACHINE_ID_THREAD_LOCAL.remove();
         }
 
-        Collection<E> eventIds = state.getEventIds();
-        if (!eventIds.contains(eventId)) {
-
-            throw new StateMachineException(String.format("发布事件[%s]失败: 对应状态[%s]不存在指定事件[%S]", eventId, stateId, eventId));
-        }
-
-        List<ITransition<S, E, C, A>> internalTransitions = Optional.ofNullable(getInternalTransition(stateId, eventId))
-                .orElse(new ArrayList<>())
-                .stream()
-                .sorted(Comparator.comparingInt(ITransition::getSort))
-                .collect(Collectors.toList());
-        for (ITransition<S, E, C, A> internalTransition : internalTransitions) {
-            internalTransition.transfer(eventContext);
-        }
-
-        ITransition<S, E, C, A> externalTransition = getExternalTransition(stateId, eventId);
-        if (externalTransition == null) {
-
-            return stateId;
-        }
-
-        return externalTransition.transfer(eventContext);
+        return stateContext;
     }
+
 }

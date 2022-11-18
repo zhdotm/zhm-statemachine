@@ -20,6 +20,6 @@ public interface IAction<A> {
      * @param args 参数
      * @return 是否执行成功
      */
-    Boolean invoke(Object... args);
+    Object invoke(Object... args);
 
 }

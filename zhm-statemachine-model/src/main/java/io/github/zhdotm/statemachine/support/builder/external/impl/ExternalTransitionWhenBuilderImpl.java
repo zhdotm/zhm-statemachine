@@ -23,7 +23,7 @@ public class ExternalTransitionWhenBuilderImpl<S, E, C, A> implements ExternalTr
     }
 
     @Override
-    public ExternalTransitionToBuilder<S, E, C, A> perform(A actionId, Function<Object[], Boolean> execute) {
+    public ExternalTransitionToBuilder<S, E, C, A> perform(A actionId, Function<Object[], Object> execute) {
         ActionImpl<A> action = ActionImpl.getInstance();
         action.actionId(actionId)
                 .execute(execute);

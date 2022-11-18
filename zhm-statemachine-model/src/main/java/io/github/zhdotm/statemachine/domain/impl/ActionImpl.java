@@ -14,7 +14,7 @@ public class ActionImpl<A> implements IAction<A> {
     @Getter
     private A actionId;
 
-    private Function<Object[], Boolean> execute;
+    private Function<Object[], Object> execute;
 
     public static <A> ActionImpl<A> getInstance() {
 
@@ -27,14 +27,14 @@ public class ActionImpl<A> implements IAction<A> {
         return this;
     }
 
-    public ActionImpl<A> execute(Function<Object[], Boolean> execute) {
+    public ActionImpl<A> execute(Function<Object[], Object> execute) {
         this.execute = execute;
 
         return this;
     }
 
     @Override
-    public Boolean invoke(Object... args) {
+    public Object invoke(Object... args) {
 
 
         return execute.apply(args);

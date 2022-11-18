@@ -20,5 +20,4 @@ public interface IEventContext<S, E> {
      */
     IEvent<E> getEvent();
 
-
 }

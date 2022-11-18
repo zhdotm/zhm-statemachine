@@ -2,9 +2,11 @@ package io.github.zhdotm.statemachine.domain;
 
 
 import io.github.zhdotm.statemachine.constant.TransitionTypeEnum;
-import io.github.zhdotm.statemachine.exception.StateMachineException;
+import io.github.zhdotm.statemachine.domain.impl.StateContextImpl;
+import io.github.zhdotm.statemachine.log.ProcessLog;
 import lombok.SneakyThrows;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -120,19 +122,24 @@ public interface ITransition<S, E, C, A> {
     ITransition<S, E, C, A> to(S stateId);
 
     @SneakyThrows
-    default S transfer(IEventContext<S, E> eventContext) {
-        ICondition<S, E, C> condition = getCondition();
-        if (!condition.isSatisfied(eventContext)) {
-
-            throw new StateMachineException("执行转换失败: 条件未通过");
-        }
-
+    default IStateContext<S, E> transfer(IEventContext<S, E> eventContext) {
+        S stateId = eventContext.getStateId();
+        IEvent<E> event = eventContext.getEvent();
+        E eventId = event.getEventId();
+        Object[] payload = event.getPayload();
         IAction<A> action = getAction();
-        if (!action.invoke(eventContext.getEvent().getPayload())) {
+        A actionId = action.getActionId();
 
-            throw new StateMachineException("执行转换失败: 执行动作失败");
-        }
+        ProcessLog.info(String.format("流程日志[%s]: 状态[%s]触发事件[%s]携带负载[%s]成功匹配动作[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload), actionId));
+        Object result = action.invoke(eventContext.getEvent().getPayload());
+        S toStateId = getToStateId();
+        ProcessLog.info(String.format("流程日志[%s]: 状态[%s]触发事件[%s]携带负载[%s]执行动作[%s]执行结果[%s]状态转换[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload), actionId, result, toStateId));
 
-        return getToStateId();
+        StateContextImpl<S, E> stateContext = StateContextImpl.getInstance();
+        stateContext.to(toStateId)
+                .result(result)
+                .eventContext(eventContext);
+
+        return stateContext;
     }
 }
