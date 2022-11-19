@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  io.github.zhdotm.statemachine.starter.web.configuration.StateMachineConfiguration
