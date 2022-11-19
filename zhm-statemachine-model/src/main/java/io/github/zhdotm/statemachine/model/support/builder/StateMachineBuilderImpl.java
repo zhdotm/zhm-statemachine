@@ -7,9 +7,9 @@ import io.github.zhdotm.statemachine.model.domain.ITransition;
 import io.github.zhdotm.statemachine.model.domain.impl.StateMachineImpl;
 import io.github.zhdotm.statemachine.model.domain.impl.TransitionImpl;
 import io.github.zhdotm.statemachine.model.support.builder.external.ExternalTransitionBuilder;
+import io.github.zhdotm.statemachine.model.support.builder.external.impl.ExternalTransitionBuilderImpl;
 import io.github.zhdotm.statemachine.model.support.builder.internal.InternalTransitionBuilder;
 import io.github.zhdotm.statemachine.model.support.builder.internal.impl.InternalTransitionBuilderImpl;
-import io.github.zhdotm.statemachine.model.support.builder.external.impl.ExternalTransitionBuilderImpl;
 
 import java.util.ArrayList;
 import java.util.List;

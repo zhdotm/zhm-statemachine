@@ -13,170 +13,6 @@ import java.util.Arrays;
 
 public class StateMachineFactoryTest {
 
-    enum StateMachineEnum {
-        /**
-         * 租金订单
-         */
-        RENT_ORDER,
-        ;
-    }
-
-    enum StateEnum {
-        /**
-         * 待初始化
-         */
-        STATE_WAIT_INIT,
-        /**
-         * 待营销
-         */
-        STATE_WAIT_PROMO,
-        /**
-         * 待结算
-         */
-        STATE_WAIT_BALANCE,
-        /**
-         * 待支付
-         */
-        STATE_WAIT_PAY,
-        /**
-         * 待记账
-         */
-        STATE_WAIT_BOOKING,
-        /**
-         * 已完成
-         */
-        STATE_FINISHED,
-        /**
-         * 已关闭
-         */
-        STATE_CLOSED,
-        /**
-         * 已取消
-         */
-        STATE_CANCELED,
-        ;
-    }
-
-    enum EventEnum {
-        /**
-         * 初始化
-         */
-        EVENT_INIT,
-        /**
-         * 营销
-         */
-        EVENT_PROMO,
-        /**
-         * 结算
-         */
-        EVENT_BALANCE,
-        /**
-         * 修改订单金额
-         */
-        EVENT_MODIFY_PRICE,
-        /**
-         * 选择支付方式
-         */
-        EVENT_CHOOSE_PAY_WAY,
-        /**
-         * 支付
-         */
-        EVENT_PAY,
-        /**
-         * 记账
-         */
-        EVENT_BOOKING,
-        /**
-         * 关闭
-         */
-        EVENT_CLOSE,
-        /**
-         * 取消
-         */
-        EVENT_CANCEL,
-        ;
-    }
-
-    enum ConditionEnum {
-        /**
-         * 能否初始化
-         */
-        IS_ABLE_INIT,
-        /**
-         * 能否营销
-         */
-        IS_ABLE_PROMO,
-        /**
-         * 能否结算
-         */
-        IS_ABLE_BALANCE,
-        /**
-         * 能否修改订单金额
-         */
-        IS_ABLE_MODIFY_PRICE,
-        /**
-         * 能否选择支付方式
-         */
-        IS_ABLE_CHOOSE_PAY_WAY,
-        /**
-         * 能否支付
-         */
-        IS_ABLE_PAY,
-        /**
-         * 能否记账
-         */
-        IS_ABLE_BOOKING,
-        /**
-         * 能否关闭
-         */
-        IS_ABLE_CLOSE,
-        /**
-         * 能否取消
-         */
-        IS_ABLE_CANCEL,
-        ;
-    }
-
-    enum ActionEnum {
-        /**
-         * 初始化
-         */
-        ACTION_INIT,
-        /**
-         * 营销
-         */
-        ACTION_PROMO,
-        /**
-         * 结算
-         */
-        ACTION_BALANCE,
-        /**
-         * 能否修改订单金额
-         */
-        ACTION_MODIFY_PRICE,
-        /**
-         * 选择支付方式
-         */
-        ACTION_CHOOSE_PAY_WAY,
-        /**
-         * 支付
-         */
-        ACTION_PAY,
-        /**
-         * 记账
-         */
-        ACTION_BOOKING,
-        /**
-         * 关闭
-         */
-        ACTION_CLOSE,
-        /**
-         * 取消
-         */
-        ACTION_CANCEL,
-        ;
-    }
-
     private IStateMachine<StateMachineEnum, StateEnum, EventEnum, ConditionEnum, ActionEnum> stateMachine = null;
 
     @Before
@@ -477,6 +313,170 @@ public class StateMachineFactoryTest {
         IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
 
         System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
+    }
+
+    enum StateMachineEnum {
+        /**
+         * 租金订单
+         */
+        RENT_ORDER,
+        ;
+    }
+
+    enum StateEnum {
+        /**
+         * 待初始化
+         */
+        STATE_WAIT_INIT,
+        /**
+         * 待营销
+         */
+        STATE_WAIT_PROMO,
+        /**
+         * 待结算
+         */
+        STATE_WAIT_BALANCE,
+        /**
+         * 待支付
+         */
+        STATE_WAIT_PAY,
+        /**
+         * 待记账
+         */
+        STATE_WAIT_BOOKING,
+        /**
+         * 已完成
+         */
+        STATE_FINISHED,
+        /**
+         * 已关闭
+         */
+        STATE_CLOSED,
+        /**
+         * 已取消
+         */
+        STATE_CANCELED,
+        ;
+    }
+
+    enum EventEnum {
+        /**
+         * 初始化
+         */
+        EVENT_INIT,
+        /**
+         * 营销
+         */
+        EVENT_PROMO,
+        /**
+         * 结算
+         */
+        EVENT_BALANCE,
+        /**
+         * 修改订单金额
+         */
+        EVENT_MODIFY_PRICE,
+        /**
+         * 选择支付方式
+         */
+        EVENT_CHOOSE_PAY_WAY,
+        /**
+         * 支付
+         */
+        EVENT_PAY,
+        /**
+         * 记账
+         */
+        EVENT_BOOKING,
+        /**
+         * 关闭
+         */
+        EVENT_CLOSE,
+        /**
+         * 取消
+         */
+        EVENT_CANCEL,
+        ;
+    }
+
+    enum ConditionEnum {
+        /**
+         * 能否初始化
+         */
+        IS_ABLE_INIT,
+        /**
+         * 能否营销
+         */
+        IS_ABLE_PROMO,
+        /**
+         * 能否结算
+         */
+        IS_ABLE_BALANCE,
+        /**
+         * 能否修改订单金额
+         */
+        IS_ABLE_MODIFY_PRICE,
+        /**
+         * 能否选择支付方式
+         */
+        IS_ABLE_CHOOSE_PAY_WAY,
+        /**
+         * 能否支付
+         */
+        IS_ABLE_PAY,
+        /**
+         * 能否记账
+         */
+        IS_ABLE_BOOKING,
+        /**
+         * 能否关闭
+         */
+        IS_ABLE_CLOSE,
+        /**
+         * 能否取消
+         */
+        IS_ABLE_CANCEL,
+        ;
+    }
+
+    enum ActionEnum {
+        /**
+         * 初始化
+         */
+        ACTION_INIT,
+        /**
+         * 营销
+         */
+        ACTION_PROMO,
+        /**
+         * 结算
+         */
+        ACTION_BALANCE,
+        /**
+         * 能否修改订单金额
+         */
+        ACTION_MODIFY_PRICE,
+        /**
+         * 选择支付方式
+         */
+        ACTION_CHOOSE_PAY_WAY,
+        /**
+         * 支付
+         */
+        ACTION_PAY,
+        /**
+         * 记账
+         */
+        ACTION_BOOKING,
+        /**
+         * 关闭
+         */
+        ACTION_CLOSE,
+        /**
+         * 取消
+         */
+        ACTION_CANCEL,
+        ;
     }
 
 }
