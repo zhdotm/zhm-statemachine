@@ -1,5 +1,6 @@
 package io.github.zhdotm.statemachine.domain.impl;
 
+import io.github.zhdotm.statemachine.constant.CharacterEnum;
 import io.github.zhdotm.statemachine.constant.TransitionTypeEnum;
 import io.github.zhdotm.statemachine.domain.IState;
 import io.github.zhdotm.statemachine.domain.IStateMachine;
@@ -51,13 +52,13 @@ public class StateMachineImpl<M, S, E, C, A> implements IStateMachine<M, S, E, C
     @Override
     public List<ITransition<S, E, C, A>> getExternalTransition(@NonNull S stateId, @NonNull E eventId) {
 
-        return externalTransitionMap.get(stateId + "_" + eventId);
+        return externalTransitionMap.get(stateId + CharacterEnum.HASH_TAG.getValue() + eventId);
     }
 
     @Override
     public List<ITransition<S, E, C, A>> getInternalTransition(@NonNull S stateId, @NonNull E eventId) {
 
-        return internalTransitionMap.get(stateId + "_" + eventId);
+        return internalTransitionMap.get(stateId + CharacterEnum.HASH_TAG.getValue() + eventId);
     }
 
     @Override
@@ -78,7 +79,8 @@ public class StateMachineImpl<M, S, E, C, A> implements IStateMachine<M, S, E, C
             if (state == null) {
                 state = StateImpl.getInstance();
             }
-            state.addEventId(eventId);
+            state.stateId(fromStateId)
+                    .addEventId(eventId);
             stateMap.put(fromStateId, state);
 
             Map<String, List<ITransition<S, E, C, A>>> transitionMap = null;
@@ -91,9 +93,9 @@ public class StateMachineImpl<M, S, E, C, A> implements IStateMachine<M, S, E, C
                 transitionMap = internalTransitionMap;
             }
 
-            List<ITransition<S, E, C, A>> transitions = transitionMap.getOrDefault(fromStateId + "_" + eventId, new ArrayList<>());
+            List<ITransition<S, E, C, A>> transitions = transitionMap.getOrDefault(fromStateId + CharacterEnum.HASH_TAG.getValue() + eventId, new ArrayList<>());
             transitions.add(transition);
-            internalTransitionMap.put(fromStateId + "_" + eventId, transitions);
+            transitionMap.put(fromStateId + CharacterEnum.HASH_TAG.getValue() + eventId, transitions);
         }
     }
 

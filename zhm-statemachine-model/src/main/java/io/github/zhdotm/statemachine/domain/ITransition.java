@@ -136,9 +136,19 @@ public interface ITransition<S, E, C, A> {
         ProcessLog.info(String.format("流程日志[%s]: 状态[%s]触发事件[%s]携带负载[%s]执行%s动作[%s]执行结果[%s]状态转换[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload), getType(), actionId, result, toStateId));
 
         StateContextImpl<S, E> stateContext = StateContextImpl.getInstance();
-        stateContext.to(toStateId)
+        stateContext
                 .result(result)
                 .eventContext(eventContext);
+
+        if (getType() == TransitionTypeEnum.EXTERNAL) {
+
+            stateContext.to(toStateId);
+        }
+
+        if (getType() == TransitionTypeEnum.INTERNAL) {
+
+            stateContext.to(stateId);
+        }
 
         return stateContext;
     }
