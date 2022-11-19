@@ -8,5 +8,5 @@ import java.util.function.Function;
 
 public interface InternalTransitionWhenBuilder<S, E, C, A> {
 
-    void perform(A actionId, Function<Object[], Object> check);
+    void perform(A actionId, Function<Object[], Object> execute);
 }
