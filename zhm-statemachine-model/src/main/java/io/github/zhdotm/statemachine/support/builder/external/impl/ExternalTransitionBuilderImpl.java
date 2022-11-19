@@ -3,6 +3,7 @@ package io.github.zhdotm.statemachine.support.builder.external.impl;
 import io.github.zhdotm.statemachine.domain.ITransition;
 import io.github.zhdotm.statemachine.support.builder.external.ExternalTransitionBuilder;
 import io.github.zhdotm.statemachine.support.builder.external.ExternalTransitionFromBuilder;
+import lombok.NonNull;
 
 import java.util.Arrays;
 
@@ -23,14 +24,14 @@ public class ExternalTransitionBuilderImpl<S, E, C, A> implements ExternalTransi
     }
 
     @Override
-    public ExternalTransitionBuilder<S, E, C, A> sort(Integer sort) {
+    public ExternalTransitionBuilder<S, E, C, A> sort(@NonNull Integer sort) {
         transition.sort(sort);
 
         return this;
     }
 
     @Override
-    public ExternalTransitionFromBuilder<S, E, C, A> from(S... stateIds) {
+    public ExternalTransitionFromBuilder<S, E, C, A> from(@NonNull S... stateIds) {
         transition.from(Arrays.asList(stateIds));
 
         return ExternalTransitionFromBuilderImpl.getInstance(transition);

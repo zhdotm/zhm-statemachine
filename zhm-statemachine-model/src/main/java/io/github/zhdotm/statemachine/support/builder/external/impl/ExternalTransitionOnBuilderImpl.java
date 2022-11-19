@@ -5,6 +5,7 @@ import io.github.zhdotm.statemachine.domain.ITransition;
 import io.github.zhdotm.statemachine.domain.impl.ConditionImpl;
 import io.github.zhdotm.statemachine.support.builder.external.ExternalTransitionOnBuilder;
 import io.github.zhdotm.statemachine.support.builder.external.ExternalTransitionWhenBuilder;
+import lombok.NonNull;
 
 import java.util.function.Function;
 
@@ -24,7 +25,7 @@ public class ExternalTransitionOnBuilderImpl<S, E, C, A> implements ExternalTran
     }
 
     @Override
-    public ExternalTransitionWhenBuilder<S, E, C, A> when(C conditionId, Function<IEventContext<S, E>, Boolean> check) {
+    public ExternalTransitionWhenBuilder<S, E, C, A> when(@NonNull C conditionId, @NonNull Function<IEventContext<S, E>, Boolean> check) {
         ConditionImpl<S, E, C> condition = ConditionImpl.getInstance();
         condition.conditionId(conditionId)
                 .check(check);

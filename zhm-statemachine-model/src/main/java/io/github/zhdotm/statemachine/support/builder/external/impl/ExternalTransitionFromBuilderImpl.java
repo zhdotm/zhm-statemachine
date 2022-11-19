@@ -3,6 +3,7 @@ package io.github.zhdotm.statemachine.support.builder.external.impl;
 import io.github.zhdotm.statemachine.domain.ITransition;
 import io.github.zhdotm.statemachine.support.builder.external.ExternalTransitionFromBuilder;
 import io.github.zhdotm.statemachine.support.builder.external.ExternalTransitionOnBuilder;
+import lombok.NonNull;
 
 /**
  * @author zhihao.mao
@@ -22,7 +23,7 @@ public class ExternalTransitionFromBuilderImpl<S, E, C, A> implements ExternalTr
     }
 
     @Override
-    public ExternalTransitionOnBuilder<S, E, C, A> on(E eventId) {
+    public ExternalTransitionOnBuilder<S, E, C, A> on(@NonNull E eventId) {
         transition.on(eventId);
 
         return ExternalTransitionOnBuilderImpl.getInstance(transition);

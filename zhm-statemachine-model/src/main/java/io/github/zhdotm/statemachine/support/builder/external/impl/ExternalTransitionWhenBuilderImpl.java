@@ -4,6 +4,7 @@ import io.github.zhdotm.statemachine.domain.ITransition;
 import io.github.zhdotm.statemachine.domain.impl.ActionImpl;
 import io.github.zhdotm.statemachine.support.builder.external.ExternalTransitionToBuilder;
 import io.github.zhdotm.statemachine.support.builder.external.ExternalTransitionWhenBuilder;
+import lombok.NonNull;
 
 import java.util.function.Function;
 
@@ -23,7 +24,7 @@ public class ExternalTransitionWhenBuilderImpl<S, E, C, A> implements ExternalTr
     }
 
     @Override
-    public ExternalTransitionToBuilder<S, E, C, A> perform(A actionId, Function<Object[], Object> execute) {
+    public ExternalTransitionToBuilder<S, E, C, A> perform(@NonNull A actionId, @NonNull Function<Object[], Object> execute) {
         ActionImpl<A> action = ActionImpl.getInstance();
         action.actionId(actionId)
                 .execute(execute);

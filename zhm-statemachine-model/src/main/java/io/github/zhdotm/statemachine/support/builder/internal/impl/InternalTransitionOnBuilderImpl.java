@@ -5,6 +5,7 @@ import io.github.zhdotm.statemachine.domain.ITransition;
 import io.github.zhdotm.statemachine.domain.impl.ConditionImpl;
 import io.github.zhdotm.statemachine.support.builder.internal.InternalTransitionOnBuilder;
 import io.github.zhdotm.statemachine.support.builder.internal.InternalTransitionWhenBuilder;
+import lombok.NonNull;
 
 import java.util.function.Function;
 
@@ -16,7 +17,7 @@ public class InternalTransitionOnBuilderImpl<S, E, C, A> implements InternalTran
 
     private ITransition<S, E, C, A> transition;
 
-    public static <S, E, C, A> InternalTransitionOnBuilderImpl<S, E, C, A> getInstance(ITransition<S, E, C, A> transition) {
+    public static <S, E, C, A> InternalTransitionOnBuilderImpl<S, E, C, A> getInstance(@NonNull ITransition<S, E, C, A> transition) {
         InternalTransitionOnBuilderImpl<S, E, C, A> transitionOnBuilder = new InternalTransitionOnBuilderImpl<>();
         transitionOnBuilder.transition = transition;
 
@@ -24,7 +25,7 @@ public class InternalTransitionOnBuilderImpl<S, E, C, A> implements InternalTran
     }
 
     @Override
-    public InternalTransitionWhenBuilder<S, E, C, A> when(C conditionId, Function<IEventContext<S, E>, Boolean> check) {
+    public InternalTransitionWhenBuilder<S, E, C, A> when(@NonNull C conditionId, @NonNull Function<IEventContext<S, E>, Boolean> check) {
         ConditionImpl<S, E, C> condition = ConditionImpl.getInstance();
         condition.conditionId(conditionId)
                 .check(check);

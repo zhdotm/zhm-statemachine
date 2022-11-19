@@ -2,6 +2,7 @@ package io.github.zhdotm.statemachine.support.builder.external.impl;
 
 import io.github.zhdotm.statemachine.domain.ITransition;
 import io.github.zhdotm.statemachine.support.builder.external.ExternalTransitionToBuilder;
+import lombok.NonNull;
 
 /**
  * @author zhihao.mao
@@ -20,7 +21,7 @@ public class ExternalTransitionToBuilderImpl<S, E, C, A> implements ExternalTran
     }
 
     @Override
-    public void to(S stateId) {
+    public void to(@NonNull S stateId) {
         transition.to(stateId);
     }
 
