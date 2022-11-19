@@ -114,7 +114,7 @@ public interface IStateMachine<M, S, E, C, A> {
             for (ITransition<S, E, C, A> internalTransition : satisfiedInternalTransitions) {
                 stateContext = internalTransition.transfer(eventContext);
             }
-            
+
             for (ITransition<S, E, C, A> satisfiedExternalTransition : satisfiedExternalTransitions) {
 
                 stateContext = satisfiedExternalTransition.transfer(eventContext);
