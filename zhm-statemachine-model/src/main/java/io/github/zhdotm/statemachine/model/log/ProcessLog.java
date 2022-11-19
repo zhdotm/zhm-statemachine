@@ -5,23 +5,23 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProcessLog {
 
-    public static void debug(String message) {
+    public static void debug(String format, Object... args) {
 
-        log.debug(message);
+        log.debug(String.format(format, args));
     }
 
-    public static void info(String message) {
+    public static void info(String format, Object... args) {
 
-        log.info(message);
+        log.info(String.format(format, args));
     }
 
-    public static void warn(String message) {
+    public static void warn(String format, Object... args) {
 
-        log.warn(message);
+        log.warn(String.format(format, args));
     }
 
-    public static void error(String message) {
+    public static void error(String format, Object... args) {
 
-        log.error(message);
+        log.error(String.format(format, args));
     }
 }

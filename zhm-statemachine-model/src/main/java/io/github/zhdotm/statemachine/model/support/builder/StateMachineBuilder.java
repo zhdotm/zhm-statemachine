@@ -2,14 +2,24 @@ package io.github.zhdotm.statemachine.model.support.builder;
 
 
 import io.github.zhdotm.statemachine.model.domain.IStateMachine;
+import io.github.zhdotm.statemachine.model.domain.ITransition;
 import io.github.zhdotm.statemachine.model.support.builder.external.ExternalTransitionBuilder;
 import io.github.zhdotm.statemachine.model.support.builder.internal.InternalTransitionBuilder;
+
+import java.util.List;
 
 /**
  * @author zhihao.mao
  */
 
 public interface StateMachineBuilder<M, S, E, C, A> {
+
+    /**
+     * 添加转换
+     *
+     * @param transitions 转换
+     */
+    void transitions(List<ITransition<S, E, C, A>> transitions);
 
     /**
      * 创建外部转换构建器

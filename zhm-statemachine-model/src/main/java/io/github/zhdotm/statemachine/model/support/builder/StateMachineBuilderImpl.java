@@ -31,6 +31,12 @@ public class StateMachineBuilderImpl<M, S, E, C, A> implements StateMachineBuild
     }
 
     @Override
+    public void transitions(List<ITransition<S, E, C, A>> transitions) {
+        this.transitions.clear();
+        this.transitions.addAll(transitions);
+    }
+
+    @Override
     public ExternalTransitionBuilder<S, E, C, A> createExternalTransition() {
         TransitionImpl<S, E, C, A> transition = TransitionImpl.getInstance();
         transition.type(TransitionTypeEnum.EXTERNAL);

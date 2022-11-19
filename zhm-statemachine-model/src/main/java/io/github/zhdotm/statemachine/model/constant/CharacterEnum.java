@@ -14,6 +14,7 @@ public enum CharacterEnum {
      * 符号
      */
     HASH_TAG("#"),
+    EMPTY(""),
     ;
 
     @Getter
