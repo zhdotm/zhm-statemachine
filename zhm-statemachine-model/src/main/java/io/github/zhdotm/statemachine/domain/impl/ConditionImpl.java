@@ -3,6 +3,7 @@ package io.github.zhdotm.statemachine.domain.impl;
 import io.github.zhdotm.statemachine.domain.ICondition;
 import io.github.zhdotm.statemachine.domain.IEventContext;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.function.Function;
 
@@ -22,20 +23,20 @@ public class ConditionImpl<S, E, C> implements ICondition<S, E, C> {
         return new ConditionImpl<>();
     }
 
-    public ConditionImpl<S, E, C> check(Function<IEventContext<S, E>, Boolean> check) {
+    public ConditionImpl<S, E, C> check(@NonNull Function<IEventContext<S, E>, Boolean> check) {
         this.check = check;
 
         return this;
     }
 
-    public ConditionImpl<S, E, C> conditionId(C conditionId) {
+    public ConditionImpl<S, E, C> conditionId(@NonNull C conditionId) {
         this.conditionId = conditionId;
 
         return this;
     }
 
     @Override
-    public Boolean isSatisfied(IEventContext<S, E> eventContext) {
+    public Boolean isSatisfied(@NonNull IEventContext<S, E> eventContext) {
 
         return check.apply(eventContext);
     }

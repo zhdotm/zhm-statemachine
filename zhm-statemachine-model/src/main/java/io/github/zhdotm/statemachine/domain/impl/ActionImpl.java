@@ -2,6 +2,7 @@ package io.github.zhdotm.statemachine.domain.impl;
 
 import io.github.zhdotm.statemachine.domain.IAction;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.function.Function;
 
@@ -21,13 +22,13 @@ public class ActionImpl<A> implements IAction<A> {
         return new ActionImpl<>();
     }
 
-    public ActionImpl<A> actionId(A actionId) {
+    public ActionImpl<A> actionId(@NonNull A actionId) {
         this.actionId = actionId;
 
         return this;
     }
 
-    public ActionImpl<A> execute(Function<Object[], Object> execute) {
+    public ActionImpl<A> execute(@NonNull Function<Object[], Object> execute) {
         this.execute = execute;
 
         return this;

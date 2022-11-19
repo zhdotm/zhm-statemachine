@@ -2,6 +2,7 @@ package io.github.zhdotm.statemachine.domain.impl;
 
 import io.github.zhdotm.statemachine.domain.IEvent;
 import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * @author zhihao.mao
@@ -20,7 +21,7 @@ public class EventImpl<E> implements IEvent<E> {
         return new EventImpl<>();
     }
 
-    public EventImpl<E> eventId(E eventId) {
+    public EventImpl<E> eventId(@NonNull E eventId) {
         this.eventId = eventId;
 
         return this;

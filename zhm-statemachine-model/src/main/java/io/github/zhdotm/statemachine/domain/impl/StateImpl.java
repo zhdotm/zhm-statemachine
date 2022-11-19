@@ -2,6 +2,7 @@ package io.github.zhdotm.statemachine.domain.impl;
 
 import io.github.zhdotm.statemachine.domain.IState;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.Collection;
@@ -27,14 +28,14 @@ public class StateImpl<S, E> implements IState<S, E> {
     }
 
     @Override
-    public StateImpl<S, E> stateId(S stateId) {
+    public StateImpl<S, E> stateId(@NonNull S stateId) {
         this.stateId = stateId;
 
         return this;
     }
 
     @Override
-    public StateImpl<S, E> addEventId(E eventId) {
+    public StateImpl<S, E> addEventId(@NonNull E eventId) {
         eventIds.add(eventId);
 
         return this;

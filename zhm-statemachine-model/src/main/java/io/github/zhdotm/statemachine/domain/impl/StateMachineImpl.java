@@ -5,6 +5,7 @@ import io.github.zhdotm.statemachine.domain.IState;
 import io.github.zhdotm.statemachine.domain.IStateMachine;
 import io.github.zhdotm.statemachine.domain.ITransition;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
@@ -29,7 +30,7 @@ public class StateMachineImpl<M, S, E, C, A> implements IStateMachine<M, S, E, C
     }
 
     @Override
-    public IStateMachine<M, S, E, C, A> stateMachineId(M stateMachineId) {
+    public IStateMachine<M, S, E, C, A> stateMachineId(@NonNull M stateMachineId) {
         this.stateMachineId = stateMachineId;
 
         return this;
@@ -42,19 +43,19 @@ public class StateMachineImpl<M, S, E, C, A> implements IStateMachine<M, S, E, C
     }
 
     @Override
-    public IState<S, E> getState(S stateId) {
+    public IState<S, E> getState(@NonNull S stateId) {
 
         return stateMap.get(stateId);
     }
 
     @Override
-    public List<ITransition<S, E, C, A>> getExternalTransition(S stateId, E eventId) {
+    public List<ITransition<S, E, C, A>> getExternalTransition(@NonNull S stateId, @NonNull E eventId) {
 
         return externalTransitionMap.get(stateId + "_" + eventId);
     }
 
     @Override
-    public List<ITransition<S, E, C, A>> getInternalTransition(S stateId, E eventId) {
+    public List<ITransition<S, E, C, A>> getInternalTransition(@NonNull S stateId, @NonNull E eventId) {
 
         return internalTransitionMap.get(stateId + "_" + eventId);
     }

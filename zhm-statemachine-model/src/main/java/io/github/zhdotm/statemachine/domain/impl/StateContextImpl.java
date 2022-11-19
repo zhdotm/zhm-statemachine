@@ -3,6 +3,7 @@ package io.github.zhdotm.statemachine.domain.impl;
 import io.github.zhdotm.statemachine.domain.IEventContext;
 import io.github.zhdotm.statemachine.domain.IStateContext;
 import lombok.Getter;
+import lombok.NonNull;
 
 public class StateContextImpl<S, E> implements IStateContext<S, E> {
 
@@ -20,7 +21,7 @@ public class StateContextImpl<S, E> implements IStateContext<S, E> {
         return new StateContextImpl<>();
     }
 
-    public StateContextImpl<S, E> to(S stateId) {
+    public StateContextImpl<S, E> to(@NonNull S stateId) {
         this.stateId = stateId;
 
         return this;
@@ -32,7 +33,7 @@ public class StateContextImpl<S, E> implements IStateContext<S, E> {
         return this;
     }
 
-    public StateContextImpl<S, E> eventContext(IEventContext<S, E> eventContext) {
+    public StateContextImpl<S, E> eventContext(@NonNull IEventContext<S, E> eventContext) {
         this.eventContext = eventContext;
 
         return this;

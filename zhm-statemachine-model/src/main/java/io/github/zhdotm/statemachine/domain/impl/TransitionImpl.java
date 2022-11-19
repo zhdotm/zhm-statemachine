@@ -5,6 +5,7 @@ import io.github.zhdotm.statemachine.domain.IAction;
 import io.github.zhdotm.statemachine.domain.ICondition;
 import io.github.zhdotm.statemachine.domain.ITransition;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -18,10 +19,13 @@ public class TransitionImpl<S, E, C, A> implements ITransition<S, E, C, A> {
 
     @Getter
     private final Collection<S> fromStateIds = new HashSet<>();
+
     @Getter
     private TransitionTypeEnum type;
+
     @Getter
     private Integer sort = Integer.MAX_VALUE;
+
     @Getter
     private S toStateId;
 
@@ -40,49 +44,49 @@ public class TransitionImpl<S, E, C, A> implements ITransition<S, E, C, A> {
     }
 
     @Override
-    public ITransition<S, E, C, A> type(TransitionTypeEnum type) {
+    public ITransition<S, E, C, A> type(@NonNull TransitionTypeEnum type) {
         this.type = type;
 
         return this;
     }
 
     @Override
-    public ITransition<S, E, C, A> sort(Integer sort) {
+    public ITransition<S, E, C, A> sort(@NonNull Integer sort) {
         this.sort = sort;
 
         return this;
     }
 
     @Override
-    public TransitionImpl<S, E, C, A> from(List<S> stateIds) {
+    public TransitionImpl<S, E, C, A> from(@NonNull List<S> stateIds) {
         fromStateIds.addAll(stateIds);
 
         return this;
     }
 
     @Override
-    public ITransition<S, E, C, A> on(E eventId) {
+    public ITransition<S, E, C, A> on(@NonNull E eventId) {
         this.eventId = eventId;
 
         return this;
     }
 
     @Override
-    public ITransition<S, E, C, A> to(S stateId) {
+    public ITransition<S, E, C, A> to(@NonNull S stateId) {
         toStateId = stateId;
 
         return this;
     }
 
     @Override
-    public TransitionImpl<S, E, C, A> when(ICondition<S, E, C> condition) {
+    public TransitionImpl<S, E, C, A> when(@NonNull ICondition<S, E, C> condition) {
         this.condition = condition;
 
         return this;
     }
 
     @Override
-    public TransitionImpl<S, E, C, A> perform(IAction<A> action) {
+    public TransitionImpl<S, E, C, A> perform(@NonNull IAction<A> action) {
         this.action = action;
 
         return this;
