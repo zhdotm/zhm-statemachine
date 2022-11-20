@@ -18,7 +18,7 @@ public interface IStateContext<S, E> {
      *
      * @return 结果负载
      */
-    Object getPayload();
+    <T> T getPayload();
 
     /**
      * 获取事件上下文

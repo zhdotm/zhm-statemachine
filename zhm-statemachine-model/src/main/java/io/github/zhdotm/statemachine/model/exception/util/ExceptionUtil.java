@@ -2,6 +2,10 @@ package io.github.zhdotm.statemachine.model.exception.util;
 
 import lombok.SneakyThrows;
 
+/**
+ * @author zhihao.mao
+ */
+
 public class ExceptionUtil {
 
     @SneakyThrows

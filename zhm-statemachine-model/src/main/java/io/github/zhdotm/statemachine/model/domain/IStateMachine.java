@@ -1,6 +1,8 @@
 package io.github.zhdotm.statemachine.model.domain;
 
 
+import io.github.zhdotm.statemachine.model.domain.impl.EventContextImpl;
+import io.github.zhdotm.statemachine.model.domain.impl.EventImpl;
 import io.github.zhdotm.statemachine.model.exception.StateMachineException;
 import io.github.zhdotm.statemachine.model.exception.util.ExceptionUtil;
 import io.github.zhdotm.statemachine.model.log.ProcessLog;
@@ -75,6 +77,25 @@ public interface IStateMachine<M, S, E, C, A> {
     /**
      * 发布事件
      *
+     * @param stateId 状态ID
+     * @param eventId 事件ID
+     * @param payload 事件负载
+     * @return 状态上下文
+     */
+    default IStateContext<S, E> fireEvent(S stateId, E eventId, Object... payload) {
+        EventContextImpl<S, E> eventContext = EventContextImpl.getInstance();
+        EventImpl<E> event = EventImpl.getInstance();
+        event.eventId(eventId)
+                .payload(payload);
+        eventContext.stateId(stateId)
+                .event(event);
+
+        return fireEvent(eventContext);
+    }
+
+    /**
+     * 发布事件
+     *
      * @param eventContext 事件上下文
      * @return 转换成功后的状态ID
      */
@@ -88,13 +109,13 @@ public interface IStateMachine<M, S, E, C, A> {
             E eventId = event.getEventId();
             Object[] payload = event.getPayload();
 
-            ProcessLog.info("流程日志[%s]: 状态[%s]收到触发事件[%s]携带负载[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload));
+            ProcessLog.info("流程日志[%s]: 状态[%s]收到事件[%s]携带负载[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload));
 
             IState<S, E> state = getState(stateId);
-            ExceptionUtil.isTrue(state != null, StateMachineException.class, "发布事件[%s]失败: 不存在对应的状态[%s]", eventId, stateId);
+            ExceptionUtil.isTrue(state != null, StateMachineException.class, "状态机[%s]发布事件[%s]失败: 不存在对应的状态[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), eventId, stateId);
 
             Collection<E> eventIds = state.getEventIds();
-            ExceptionUtil.isTrue(eventIds.contains(eventId), StateMachineException.class, "发布事件[%s]失败: 对应状态[%s]不存在指定事件[%S]", eventId, stateId, eventId);
+            ExceptionUtil.isTrue(eventIds.contains(eventId), StateMachineException.class, "状态机[%s]发布事件[%s]失败: 对应状态[%s]不存在指定事件[%S]", STATEMACHINE_ID_THREAD_LOCAL.get(), eventId, stateId, eventId);
 
             List<ITransition<S, E, C, A>> satisfiedInternalTransitions = Optional.ofNullable(getInternalTransition(stateId, eventId))
                     .orElse(new ArrayList<>())

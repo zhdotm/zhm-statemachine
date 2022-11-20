@@ -2,6 +2,10 @@ package io.github.zhdotm.statemachine.model.log;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @author zhihao.mao
+ */
+
 @Slf4j
 public class ProcessLog {
 

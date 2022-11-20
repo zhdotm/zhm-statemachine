@@ -23,12 +23,12 @@ public class StateMachineProcessor implements SmartInstantiationAwareBeanPostPro
 
         if (stateMachineComponent != null) {
 
-            ExceptionUtil.isTrue(bean instanceof ITransitionAdapter, StateMachineException.class, "构建[%s]bean失败: 携带@StateMachineComponent注解的Bean必须实现TransitionAdapter接口", beanName);
-        }
+            if (stateMachineComponent.type() == TransitionTypeEnum.EXTERNAL) {
 
-        if (stateMachineComponent.type() == TransitionTypeEnum.EXTERNAL) {
+                ExceptionUtil.isTrue(!CharacterEnum.EMPTY.getValue().equalsIgnoreCase(stateMachineComponent.to()), StateMachineException.class, "构建[%s]Bean失败: 外部转换必须指定转换后状态", beanName);
+            }
 
-            ExceptionUtil.isTrue(!CharacterEnum.EMPTY.getValue().equalsIgnoreCase(stateMachineComponent.to()), StateMachineException.class, "构建[%s]bean失败: 外部转换必须指定转换后状态", beanName);
+            ExceptionUtil.isTrue(bean instanceof ITransitionAdapter, StateMachineException.class, "构建[%s]Bean失败: 携带@StateMachineComponent注解的Bean必须实现TransitionAdapter接口", beanName);
         }
 
         return bean;

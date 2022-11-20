@@ -130,10 +130,10 @@ public interface ITransition<S, E, C, A> {
         IAction<A> action = getAction();
         A actionId = action.getActionId();
 
-        ProcessLog.info("流程日志[%s]: 状态[%s]触发事件[%s]携带负载[%s]成功匹配%s动作[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload), getType(), actionId);
+        ProcessLog.info("流程日志[%s]: 状态[%s]触发事件[%s]携带负载[%s]成功匹配[%s]动作[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload), getType(), actionId);
         Object result = action.invoke(eventContext.getEvent().getPayload());
         S toStateId = getToStateId();
-        ProcessLog.info("流程日志[%s]: 状态[%s]触发事件[%s]携带负载[%s]执行%s动作[%s]执行结果[%s]状态转换[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload), getType(), actionId, result, toStateId);
+        ProcessLog.info("流程日志[%s]: 状态[%s]触发事件[%s]携带负载[%s]执行[%s]动作[%s]执行结果[%s]状态转换[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload), getType(), actionId, result, toStateId);
 
         StateContextImpl<S, E> stateContext = StateContextImpl.getInstance();
         stateContext

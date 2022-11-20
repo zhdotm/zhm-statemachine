@@ -17,6 +17,7 @@ import lombok.SneakyThrows;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -26,6 +27,7 @@ import java.util.function.Function;
 public interface ITransitionAdapter {
 
     default ITransition<String, String, String, String> getTransition() {
+        Object obj = this;
         Class<?> clazz = this.getClass();
         String clazzName = clazz.getName();
         StateMachineComponent stateMachineComponent = clazz.getDeclaredAnnotation(StateMachineComponent.class);
@@ -36,7 +38,7 @@ public interface ITransitionAdapter {
         Method actionMethod = getActionMethod();
         String actionMethodName = getActionMethod().getName();
         Class<?>[] actionMethodParameterTypes = actionMethod.getParameterTypes();
-        ExceptionUtil.isTrue(matchMethodParameterTypes(conditionMethodParameterTypes, actionMethodParameterTypes), StateMachineException.class, "获取转换失败: [%s]类上的[%s]条件方法的参数和[%]动作方法的参数不匹配", clazzName, conditionMethodName, actionMethodName);
+        ExceptionUtil.isTrue(matchMethodParameterTypes(conditionMethodParameterTypes, actionMethodParameterTypes), StateMachineException.class, "获取转换失败: [%s]类上的[%s]条件方法的参数和[%s]动作方法的参数不匹配", clazzName, conditionMethodName, actionMethodName);
 
         TransitionImpl<String, String, String, String> transition = TransitionImpl.getInstance();
         ConditionImpl<String, String, String> condition = ConditionImpl.getInstance();
@@ -46,9 +48,9 @@ public interface ITransitionAdapter {
                     @Override
                     public Boolean apply(IEventContext<String, String> eventContext) {
                         IEvent<String> event = eventContext.getEvent();
-                        Object[] payload = event.getPayload();
+                        Object[] args = convertPayloadToArgs(event.getPayload(), conditionMethod, clazzName);
 
-                        return (Boolean) conditionMethod.invoke(this, payload);
+                        return (Boolean) conditionMethod.invoke(obj, args);
                     }
                 });
         ActionImpl<String> action = ActionImpl.getInstance();
@@ -57,8 +59,9 @@ public interface ITransitionAdapter {
                     @SneakyThrows
                     @Override
                     public Object apply(Object[] args) {
+                        args = convertPayloadToArgs(args, actionMethod, clazzName);
 
-                        return actionMethod.invoke(this, args);
+                        return actionMethod.invoke(obj, args);
                     }
                 });
         transition.type(stateMachineComponent.type())
@@ -74,25 +77,21 @@ public interface ITransitionAdapter {
     }
 
     default Boolean matchMethodParameterTypes(Class<?>[] conditionMethodParameterTypes, Class<?>[] actionMethodParameterTypes) {
-        if (conditionMethodParameterTypes == null && actionMethodParameterTypes == null) {
+        if (conditionMethodParameterTypes.length != actionMethodParameterTypes.length) {
 
-            return Boolean.TRUE;
+            return Boolean.FALSE;
         }
 
-        if (conditionMethodParameterTypes != null && actionMethodParameterTypes != null) {
-            for (int i = 0; i < conditionMethodParameterTypes.length; i++) {
-                Class<?> conditionMethodParameterType = conditionMethodParameterTypes[i];
-                Class<?> actionMethodParameterType = actionMethodParameterTypes[i];
-                if (conditionMethodParameterType != actionMethodParameterType) {
+        for (int i = 0; i < conditionMethodParameterTypes.length; i++) {
+            Class<?> conditionMethodParameterType = conditionMethodParameterTypes[i];
+            Class<?> actionMethodParameterType = actionMethodParameterTypes[i];
+            if (conditionMethodParameterType != actionMethodParameterType) {
 
-                    return Boolean.FALSE;
-                }
+                return Boolean.FALSE;
             }
-
-            return Boolean.TRUE;
         }
 
-        return Boolean.FALSE;
+        return Boolean.TRUE;
     }
 
     default String getStateMachineId() {
@@ -159,6 +158,26 @@ public interface ITransitionAdapter {
         ExceptionUtil.isTrue(targetMethod != null, StateMachineException.class, "[%s]类的方法上不存在[%s]注解", clazzName, annotationClazz.getName());
 
         return targetMethod;
+    }
+
+    default Object[] convertPayloadToArgs(Object[] payload, Method method, String clazzName) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        String methodName = method.getName();
+        payload = Optional
+                .ofNullable(payload)
+                .orElse(new Object[0]);
+        int payloadLength = payload.length;
+        int parameterTypesLength = parameterTypes.length;
+        ExceptionUtil.isTrue(payloadLength <= parameterTypesLength, StateMachineException.class, "事件负载[%s]转换为[%s]类的[%s]方法的执行参数失败: 事件负载参数个数大于执行参数个数", Arrays.toString(payload), clazzName, methodName);
+        Object[] args = new Object[parameterTypesLength];
+        for (int i = 0; i < args.length; i++) {
+            if (i < payloadLength) {
+                ExceptionUtil.isTrue(payload[i].getClass() == parameterTypes[i], StateMachineException.class, "事件负载[%s]转换为[%s]类的[%s]方法的执行参数失败: 参数类型不匹配", Arrays.toString(payload), clazzName, methodName);
+                args[i] = payload[i];
+            }
+        }
+
+        return args;
     }
 
 }

@@ -11,6 +11,10 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+/**
+ * @author zhihao.mao
+ */
+
 public class StateMachineFactoryTest {
 
     private IStateMachine<StateMachineEnum, StateEnum, EventEnum, ConditionEnum, ActionEnum> stateMachine = null;
@@ -212,7 +216,8 @@ public class StateMachineFactoryTest {
                 .payload("用户: 张三", "订单: xxxxxxx", "金额: 99", "商品: 租金");
         eventContext.stateId(StateEnum.STATE_WAIT_INIT)
                 .event(event);
-        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_INIT, EventEnum.EVENT_INIT, "用户: 张三", "订单: xxxxxxx", "金额: 99", "商品: 租金");
 
         System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
     }
@@ -226,7 +231,8 @@ public class StateMachineFactoryTest {
                 .payload("订单: xxxxxxx", "营销方案: 满100减50");
         eventContext.stateId(StateEnum.STATE_WAIT_PROMO)
                 .event(event);
-        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PROMO, EventEnum.EVENT_PROMO, "订单: xxxxxxx", "营销方案: 满100减50");
 
         System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
     }
@@ -240,7 +246,8 @@ public class StateMachineFactoryTest {
                 .payload("订单: xxxxxxx", "修改金额方案: 将金额修改为50");
         eventContext.stateId(StateEnum.STATE_WAIT_PROMO)
                 .event(event);
-        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PROMO, EventEnum.EVENT_MODIFY_PRICE, "订单: xxxxxxx", "修改金额方案: 将金额修改为50");
 
         System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
     }
@@ -254,7 +261,8 @@ public class StateMachineFactoryTest {
                 .payload("订单: xxxxxxx", "结算: 计算后的金额10");
         eventContext.stateId(StateEnum.STATE_WAIT_BALANCE)
                 .event(event);
-        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_BALANCE, EventEnum.EVENT_BALANCE, "订单: xxxxxxx", "结算: 计算后的金额10");
 
         System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
     }
@@ -268,7 +276,8 @@ public class StateMachineFactoryTest {
                 .payload("订单: xxxxxxx", "支付金额: 10");
         eventContext.stateId(StateEnum.STATE_WAIT_PAY)
                 .event(event);
-        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY, EventEnum.EVENT_PAY, "订单: xxxxxxx", "支付金额: 10");
 
         System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
     }
@@ -282,7 +291,8 @@ public class StateMachineFactoryTest {
                 .payload("订单: xxxxxxx", "记账: 用户积分、信誉分改动");
         eventContext.stateId(StateEnum.STATE_WAIT_BOOKING)
                 .event(event);
-        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_BOOKING, EventEnum.EVENT_BOOKING, "订单: xxxxxxx", "记账: 用户积分、信誉分改动");
 
         System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
     }
@@ -296,7 +306,8 @@ public class StateMachineFactoryTest {
                 .payload("订单: xxxxxxx", "取消订单理由: 点错了");
         eventContext.stateId(StateEnum.STATE_WAIT_PAY)
                 .event(event);
-        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY, EventEnum.EVENT_CANCEL, "订单: xxxxxxx", "取消订单理由: 点错了");
 
         System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
     }
@@ -310,7 +321,8 @@ public class StateMachineFactoryTest {
                 .payload("订单: xxxxxxx", "关闭订单理由: 点错了");
         eventContext.stateId(StateEnum.STATE_WAIT_PAY)
                 .event(event);
-        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY, EventEnum.EVENT_CLOSE, "订单: xxxxxxx", "关闭订单理由: 点错了");
 
         System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
     }
