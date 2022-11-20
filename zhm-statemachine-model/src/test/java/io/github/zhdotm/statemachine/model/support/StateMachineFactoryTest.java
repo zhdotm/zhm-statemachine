@@ -67,11 +67,10 @@ public class StateMachineFactoryTest {
             return "动作取消执行成功";
         }).to(StateEnum.STATE_CANCELED);
 
-        //修改订单金额（待初始化、待营销、待结算、待支付 ）
+        //修改订单金额（待营销、待结算、待支付 ）
         stateMachineBuilder
                 .createInternalTransition()
-                .from(StateEnum.STATE_WAIT_INIT,
-                        StateEnum.STATE_WAIT_PROMO,
+                .from(StateEnum.STATE_WAIT_PROMO,
                         StateEnum.STATE_WAIT_BALANCE,
                         StateEnum.STATE_WAIT_PAY)
                 .on(EventEnum.EVENT_MODIFY_PRICE)

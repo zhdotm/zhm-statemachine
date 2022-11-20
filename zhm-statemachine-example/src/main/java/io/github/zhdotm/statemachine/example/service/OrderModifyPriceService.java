@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @StateMachineComponent(
         stateMachineId = "RENT_ORDER",
         type = TransitionTypeEnum.INTERNAL,
-        from = {"STATE_WAIT_INIT", "STATE_WAIT_PROMO", "STATE_WAIT_BALANCE", "STATE_WAIT_PAY"},
+        from = {"STATE_WAIT_PROMO", "STATE_WAIT_BALANCE", "STATE_WAIT_PAY"},
         on = "EVENT_MODIFY_PRICE"
 )
 public class OrderModifyPriceService implements ITransitionAdapter {
