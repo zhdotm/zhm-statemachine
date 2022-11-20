@@ -14,7 +14,7 @@
 
 ### 核心概念
 
-![img](https://raw.githubusercontent.com/zhdotm/picture-storage/main/format%252Cpng.png)
+![image-20221120215038268](https://raw.githubusercontent.com/zhdotm/picture-storage/main/image-20221120215038268.png)
 
 #### State
 
