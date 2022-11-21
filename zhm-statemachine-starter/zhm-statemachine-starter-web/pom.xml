@@ -21,7 +21,7 @@
         <dependency>
             <groupId>io.github.zhdotm</groupId>
             <artifactId>zhm-statemachine-model</artifactId>
-            <version>1.1.1</version>
+            <version>${project.version}</version>
         </dependency>
         <!-- Web 相关 -->
         <dependency>
