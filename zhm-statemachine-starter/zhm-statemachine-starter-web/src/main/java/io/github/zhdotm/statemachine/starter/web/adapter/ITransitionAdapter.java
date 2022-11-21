@@ -125,7 +125,7 @@ public interface ITransitionAdapter {
         Method actionMethod = getActionMethod();
         StateMachineAction stateMachineAction = actionMethod.getDeclaredAnnotation(StateMachineAction.class);
 
-        return stateMachineAction.acitonId();
+        return stateMachineAction.actionId();
     }
 
     default Method getActionMethod() {

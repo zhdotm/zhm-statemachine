@@ -30,7 +30,7 @@ public class OrderCloseService implements ITransitionAdapter {
         return Boolean.TRUE;
     }
 
-    @StateMachineAction(acitonId = "ACTION_CLOSE")
+    @StateMachineAction(actionId = "ACTION_CLOSE")
     public String execute(String orderId) {
         System.out.println("执行关闭订单动作");
         System.out.println("关闭订单: " + orderId);

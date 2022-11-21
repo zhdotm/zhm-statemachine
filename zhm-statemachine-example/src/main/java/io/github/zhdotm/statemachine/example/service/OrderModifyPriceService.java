@@ -29,7 +29,7 @@ public class OrderModifyPriceService implements ITransitionAdapter {
         return Boolean.TRUE;
     }
 
-    @StateMachineAction(acitonId = "ACTION_MODIFY_PRICE")
+    @StateMachineAction(actionId = "ACTION_MODIFY_PRICE")
     public String execute(String orderId, Long price) {
         System.out.println("执行修改订单金额动作");
         System.out.println("修改订单金额: 将" + orderId + "的订单金额修改为" + price);

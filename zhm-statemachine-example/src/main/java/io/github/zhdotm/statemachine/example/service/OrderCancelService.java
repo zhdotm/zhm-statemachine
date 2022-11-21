@@ -28,7 +28,7 @@ public class OrderCancelService implements ITransitionAdapter {
         return Boolean.TRUE;
     }
 
-    @StateMachineAction(acitonId = "ACTION_CANCEL")
+    @StateMachineAction(actionId = "ACTION_CANCEL")
     public String execute(String orderId) {
         System.out.println("执行取消订单动作");
         System.out.println("取消订单: " + orderId);

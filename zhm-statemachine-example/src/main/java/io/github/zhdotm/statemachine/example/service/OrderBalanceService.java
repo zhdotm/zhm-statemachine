@@ -30,7 +30,7 @@ public class OrderBalanceService implements ITransitionAdapter {
         return Boolean.TRUE;
     }
 
-    @StateMachineAction(acitonId = "ACTION_BALANCE")
+    @StateMachineAction(actionId = "ACTION_BALANCE")
     public String execute(String orderId) {
         System.out.println("执行订单结算动作");
         System.out.println("订单" + orderId + "结算后的金额为50");

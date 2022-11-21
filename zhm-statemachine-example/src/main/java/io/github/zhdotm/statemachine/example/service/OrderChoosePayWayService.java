@@ -29,7 +29,7 @@ public class OrderChoosePayWayService implements ITransitionAdapter {
         return Boolean.TRUE;
     }
 
-    @StateMachineAction(acitonId = "ACTION_CHOOSE_PAY_WAY")
+    @StateMachineAction(actionId = "ACTION_CHOOSE_PAY_WAY")
     public String execute(String orderId, String payWay) {
         System.out.println("执行选择订单" + orderId + "支付方式" + payWay + "动作");
 

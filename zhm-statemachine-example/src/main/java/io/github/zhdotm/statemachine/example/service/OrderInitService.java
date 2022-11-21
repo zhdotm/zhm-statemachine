@@ -30,7 +30,7 @@ public class OrderInitService implements ITransitionAdapter {
         return Boolean.TRUE;
     }
 
-    @StateMachineAction(acitonId = "ACTION_INIT")
+    @StateMachineAction(actionId = "ACTION_INIT")
     public String execute(String orderId, String buyerId, String commodityId, Integer quantity, Long unitPrice) {
         System.out.println("执行初始化订单动作");
         System.out.printf("订单ID[%s], 购买人ID[%s], 商品ID[%s], 数量[%s], 单价[%s]%n", orderId, buyerId, commodityId, quantity, unitPrice);

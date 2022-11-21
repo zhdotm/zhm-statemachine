@@ -30,7 +30,7 @@ public class OrderBookingService implements ITransitionAdapter {
         return Boolean.TRUE;
     }
 
-    @StateMachineAction(acitonId = "ACTION_BOOKING")
+    @StateMachineAction(actionId = "ACTION_BOOKING")
     public String execute(String orderId) {
         System.out.println("执行订单记账动作");
         System.out.println("订单" + orderId + "执行订单记账动作");

@@ -30,7 +30,7 @@ public class OrderPromoService implements ITransitionAdapter {
         return Boolean.TRUE;
     }
 
-    @StateMachineAction(acitonId = "ACTION_PROMO")
+    @StateMachineAction(actionId = "ACTION_PROMO")
     public String execute(String orderId, String couponId) {
         System.out.println("执行营销订单动作");
         System.out.printf("订单[%s]使用优惠券[%s]%n", orderId, couponId);

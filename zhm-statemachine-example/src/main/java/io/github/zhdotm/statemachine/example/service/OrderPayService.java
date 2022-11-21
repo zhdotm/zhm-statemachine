@@ -30,7 +30,7 @@ public class OrderPayService implements ITransitionAdapter {
         return Boolean.TRUE;
     }
 
-    @StateMachineAction(acitonId = "ACTION_PAY")
+    @StateMachineAction(actionId = "ACTION_PAY")
     public String execute(String arg) {
         System.out.println("执行关闭订单动作");
 
