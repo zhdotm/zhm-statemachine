@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zhm-statemachine</artifactId>
         <groupId>io.github.zhdotm</groupId>
-        <version>1.1.0</version>
+        <version>1.1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,8 +15,6 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <slf4j.version>1.7.33</slf4j.version>
-        <lombok.version>1.18.24</lombok.version>
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -24,6 +22,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
