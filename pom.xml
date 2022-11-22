@@ -8,6 +8,14 @@
     <artifactId>zhm-statemachine</artifactId>
     <packaging>pom</packaging>
     <version>1.1.1</version>
+    <name>zhm-statemachine</name>
+    <description>状态机</description>
+    <url>https://github.com/zhdotm/zhm-statemachine</url>
+    <developers>
+        <developer>
+            <name>zhihao.mao</name>
+        </developer>
+    </developers>
     <modules>
         <module>zhm-statemachine-model</module>
         <module>zhm-statemachine-starter</module>
