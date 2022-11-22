@@ -8,7 +8,216 @@
 
 ### 使用场景
 
-适合在业务流程较长场景复杂的需求中使用。
+适合在业务流程较长场景较为复杂的需求中使用。
+
+### 与cola-statemachine的区别
+
+zhm-statemachine灵感来源于https://github.com/alibaba/COLA/tree/master/cola-components/cola-component-statemachine，并在其设计思想的前提下，做了部分改动。
+
+#### 1、统一外部流转、内部流转、批量流转的语法
+
+##### cola-statemachine语法
+
+构建外部转换
+
+```java
+builder.externalTransition()
+    .from(States.STATE1)
+    .to(States.STATE2)
+    .on(Events.EVENT1)
+    .when(checkCondition())
+    .perform(doAction());
+```
+
+构建内部流转
+
+```java
+builder.internalTransition()
+    .within(States.STATE1)
+    .on(Events.INTERNAL_EVENT)
+    .when(checkCondition())
+    .perform(doAction());
+```
+
+构建批量流转
+
+```java
+builder.externalTransitions()
+    .fromAmong(States.STATE1, States.STATE2, States.STATE3)
+    .to(States.STATE4)
+    .on(Events.EVENT1)
+    .when(checkCondition())
+    .perform(doAction());
+```
+
+##### zhm-statemachine语法
+
+统一流转构建
+
+创建外部流转
+
+```java
+//待结算 -> 待支付
+stateMachineBuilder
+        .createExternalTransition()
+        .from(StateEnum.STATE_WAIT_BALANCE)
+        .on(EventEnum.EVENT_BALANCE)
+        .when(ConditionEnum.IS_ABLE_BALANCE, stateEnumEventEnumIEventContext -> {
+            System.out.println("检查能否结算订单");
+            IEvent<EventEnum> event = stateEnumEventEnumIEventContext.getEvent();
+            Object[] payload = event.getPayload();
+            System.out.println("收到事件参数负载: " + Arrays.toString(payload));
+
+            return Boolean.TRUE;
+        }).perform(ActionEnum.ACTION_BALANCE, args -> {
+    System.out.println("执行订单结算动作");
+    System.out.println("收到事件参数负载: " + Arrays.toString(args));
+
+    return "动作结算订单执行成功";
+}).to(StateEnum.STATE_WAIT_PAY);
+```
+
+创建内部流转
+
+```java
+//选择支付方式（待支付）
+stateMachineBuilder
+        .createInternalTransition()
+        .from(StateEnum.STATE_WAIT_PAY)
+        .on(EventEnum.EVENT_CHOOSE_PAY_WAY)
+        .when(ConditionEnum.IS_ABLE_CHOOSE_PAY_WAY, stateEnumEventEnumIEventContext -> {
+            System.out.println("检查能否选择支付方式");
+            IEvent<EventEnum> event = stateEnumEventEnumIEventContext.getEvent();
+            Object[] payload = event.getPayload();
+            System.out.println("收到事件参数负载: " + Arrays.toString(payload));
+
+            return Boolean.TRUE;
+        }).perform(ActionEnum.ACTION_CHOOSE_PAY_WAY, args -> {
+    System.out.println("执行选择支付方式动作");
+    System.out.println("收到事件参数负载: " + Arrays.toString(args));
+
+    return "动作选择支付方式执行成功";
+});
+```
+
+创建批量流转
+
+```java
+//修改订单金额（待营销、待结算、待支付 ）
+stateMachineBuilder
+        .createInternalTransition()
+        .from(StateEnum.STATE_WAIT_PROMO,
+                StateEnum.STATE_WAIT_BALANCE,
+                StateEnum.STATE_WAIT_PAY)
+        .on(EventEnum.EVENT_MODIFY_PRICE)
+        .when(ConditionEnum.IS_ABLE_MODIFY_PRICE, stateEnumEventEnumIEventContext -> {
+            System.out.println("检查能否修改订单金额");
+            IEvent<EventEnum> event = stateEnumEventEnumIEventContext.getEvent();
+            Object[] payload = event.getPayload();
+            System.out.println("收到事件参数负载: " + Arrays.toString(payload));
+
+            return Boolean.TRUE;
+        }).perform(ActionEnum.ACTION_MODIFY_PRICE, args -> {
+    System.out.println("执行修改订单金额动作");
+    System.out.println("收到事件参数负载: " + Arrays.toString(args));
+
+    return "动作修改订单金额执行成功";
+});
+```
+
+#### 2、引入事件上下文概念
+
+##### cola-statemachine语法
+
+cola-statemachine的模型中并未设计事件上下文概念
+
+```java
+States target = stateMachine.fireEvent(States.STATE1, Events.EVENT1, new Context());
+```
+
+##### zhm-statemachine语法
+
+引入事件上下文概念，事件负载采用不定参数，事件上下文绑定状态、事件、以及负载。
+
+发送事件可以采用发送事件上下文语法，或类cola-statemachine的发送事件语法。
+
+```java
+    //08、关闭订单
+        EventContextImpl<StateEnum, EventEnum> eventContext = EventContextImpl.getInstance();
+        EventImpl<EventEnum> event = EventImpl.getInstance();
+        event.eventId(EventEnum.EVENT_CLOSE)
+                .payload("订单: xxxxxxx", "关闭订单理由: 点错了");
+        eventContext.stateId(StateEnum.STATE_WAIT_PAY)
+                .event(event);
+//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY, EventEnum.EVENT_CLOSE, "订单: xxxxxxx", "关闭订单理由: 点错了");
+```
+
+#### 3、引入状态上下文概念
+
+##### cola-statemachine语法
+
+cola-statemachine的模型中并未设计状态上下文概念，触发完事件后，仅仅返还流转后的状态，并未携带流转后的信息。
+
+```java
+States target = stateMachine.fireEvent(States.STATE1, Events.EVENT1, new Context());
+Assert.assertEquals(States.STATE2, target);
+```
+
+##### zhm-statemachine语法
+
+触发完事件后，返回状态上下文，状态上下文中携带流转后的状态、状态负载，以及触发该流转的事件上下文。
+
+```java
+IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY, EventEnum.EVENT_CLOSE, "订单: xxxxxxx", "关闭订单理由: 点错了");
+
+System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
+```
+
+#### 4、声明式定义状态机
+
+##### cola-statemachine语法
+
+并未提供
+
+##### zhm-statemachine语法
+
+引入@StateMachineComponent、@StateMachineAction、@StateMachineCondition注解用于声明一个状态机组件。
+
+```java
+/**
+ * 结算
+ *
+ * @author zhihao.mao
+ */
+
+@Component
+@StateMachineComponent(
+        stateMachineId = "RENT_ORDER",
+        type = TransitionTypeEnum.EXTERNAL,
+        from = {"STATE_WAIT_BALANCE"},
+        on = "EVENT_BALANCE",
+        to = "STATE_WAIT_PAY"
+)
+public class OrderBalanceService implements ITransitionAdapter {
+
+    @StateMachineCondition(conditionId = "IS_ABLE_BALANCE")
+    public Boolean check(String orderId) {
+        System.out.println("检查能否结算订单");
+
+        return Boolean.TRUE;
+    }
+
+    @StateMachineAction(actionId = "ACTION_BALANCE")
+    public String execute(String orderId) {
+        System.out.println("执行订单结算动作");
+        System.out.println("订单" + orderId + "结算后的金额为50");
+
+        return "执行结束";
+    }
+
+}
+```
 
 ## 介绍
 
@@ -16,35 +225,35 @@
 
 ![image-20221120215038268](https://raw.githubusercontent.com/zhdotm/picture-storage/main/image-20221120215038268.png)
 
-#### State
+#### 1、State
 
 状态
 
-#### Event
+#### 2、Event
 
 事件，状态由事件触发，引起变化
 
-#### Transition
+#### 3、Transition
 
 流转，表示从一个状态到另一个状态
 
-#### External Transition
+#### 4、External Transition
 
 外部流转，两个不同状态之间的流转
 
-#### Internal Transition
+#### 5、Internal Transition
 
 内部流转，同一个状态之间的流转
 
-#### Condition
+#### 6、Condition
 
 条件，表示是否允许到达某个状态
 
-#### Action
+#### 7、Action
 
 动作，到达某个状态之后，可以做什么
 
-#### StateMachine
+#### 8、StateMachine
 
 状态机
 
@@ -60,7 +269,17 @@
 
 #### 原生场景下使用
 
-##### 定义状态机ID
+##### 1、添加依赖
+
+```xml
+<dependency>
+    <groupId>io.github.zhdotm</groupId>
+    <artifactId>zhm-statemachine-model</artifactId>
+    <version>1.1.2</version>
+</dependency>
+```
+
+##### 2、定义状态机ID
 
 ```java
 enum StateMachineEnum {
@@ -72,7 +291,7 @@ enum StateMachineEnum {
 }
 ```
 
-##### 定义状态ID
+##### 3、定义状态ID
 
 ```java
 enum StateEnum {
@@ -112,7 +331,7 @@ enum StateEnum {
 }
 ```
 
-##### 定义事件ID
+##### 4、定义事件ID
 
 ```java
 enum EventEnum {
@@ -156,7 +375,7 @@ enum EventEnum {
 }
 ```
 
-##### 定义条件ID
+##### 5、定义条件ID
 
 ```java
 enum ConditionEnum {
@@ -200,7 +419,7 @@ enum ConditionEnum {
 }
 ```
 
-##### 定义动作ID
+##### 6、定义动作ID
 
 ```java
 enum ActionEnum {
@@ -244,7 +463,7 @@ enum ActionEnum {
 }
 ```
 
-##### 构建状态机
+##### 7、构建状态机
 
 ```java
 public void build() {
@@ -434,7 +653,7 @@ public void build() {
 }
 ```
 
-##### 发送事件
+##### 8、发送事件
 
 ```java
     @Test
@@ -545,7 +764,17 @@ public void build() {
 
 #### Spring框架下使用
 
-##### 修改配置
+##### 1、添加依赖
+
+```xml
+<dependency>
+    <groupId>io.github.zhdotm</groupId>
+    <artifactId>zhm-statemachine-starter-web</artifactId>
+    <version>1.1.2</version>
+</dependency>
+```
+
+##### 2、修改配置
 
 ```yaml
 zhm:
@@ -553,7 +782,7 @@ zhm:
     enable: true
 ```
 
-##### 定义状态机组件
+##### 3、定义状态机组件
 
 如果一个实现了ITransitionAdapter接口的类被@StateMachineComponent注解，且用@StateMachineCondition、@StateMachineAction指定了该类上的方法为条件判断方法和动作方法，那么这个类可被视为一个状态机组件。
 
@@ -866,7 +1095,7 @@ public class OrderCloseService implements ITransitionAdapter {
 }
 ```
 
-##### 发送事件
+##### 4、发送事件
 
 ```java
 /**
