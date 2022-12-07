@@ -1,11 +1,14 @@
 package io.github.zhdotm.statemachine.model.support;
 
 import io.github.zhdotm.statemachine.model.domain.IEvent;
+import io.github.zhdotm.statemachine.model.domain.IEventContext;
 import io.github.zhdotm.statemachine.model.domain.IStateContext;
 import io.github.zhdotm.statemachine.model.domain.IStateMachine;
 import io.github.zhdotm.statemachine.model.domain.impl.EventContextImpl;
 import io.github.zhdotm.statemachine.model.domain.impl.EventImpl;
-import io.github.zhdotm.statemachine.model.support.builder.StateMachineBuilder;
+import io.github.zhdotm.statemachine.model.support.builder.context.event.IEventContextBuilder;
+import io.github.zhdotm.statemachine.model.support.builder.event.IEventBuilder;
+import io.github.zhdotm.statemachine.model.support.builder.machine.IStateMachineBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +24,7 @@ public class StateMachineFactoryTest {
 
     @Before
     public void build() {
-        StateMachineBuilder<StateMachineEnum, StateEnum, EventEnum, ConditionEnum, ActionEnum> stateMachineBuilder = StateMachineFactory.create();
+        IStateMachineBuilder<StateMachineEnum, StateEnum, EventEnum, ConditionEnum, ActionEnum> stateMachineBuilder = StateMachineFactory.create();
 
         //待初始化、待营销、待结算、待支付 -> 关闭
         stateMachineBuilder
@@ -209,14 +212,23 @@ public class StateMachineFactoryTest {
     @Test
     public void init() {
         //01、初始化订单
-        EventContextImpl<StateEnum, EventEnum> eventContext = EventContextImpl.getInstance();
-        EventImpl<EventEnum> event = EventImpl.getInstance();
-        event.eventId(EventEnum.EVENT_INIT)
-                .payload("用户: 张三", "订单: xxxxxxx", "金额: 99", "商品: 租金");
-        eventContext.stateId(StateEnum.STATE_WAIT_INIT)
-                .event(event);
+//        EventContextImpl<StateEnum, EventEnum> eventContext = EventContextImpl.getInstance();
+//        EventImpl<EventEnum> event = EventImpl.getInstance();
+//        event.eventId(EventEnum.EVENT_INIT)
+//                .payload("用户: 张三", "订单: xxxxxxx", "金额: 99", "商品: 租金");
+//        eventContext.from(StateEnum.STATE_WAIT_INIT)
+//                .on(event);
 //        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
-        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_INIT, EventEnum.EVENT_INIT, "用户: 张三", "订单: xxxxxxx", "金额: 99", "商品: 租金");
+//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_INIT, EventEnum.EVENT_INIT, "用户: 张三", "订单: xxxxxxx", "金额: 99", "商品: 租金");
+        IEventContextBuilder<StateEnum, EventEnum> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<EventEnum> eventBuilder = EventFactory.create();
+        IEvent<EventEnum> event = eventBuilder
+                .payload("用户: 张三", "订单: xxxxxxx", "金额: 99", "商品: 租金")
+                .build(EventEnum.EVENT_INIT);
+        IEventContext<StateEnum, EventEnum> eventContext = eventContextBuilder
+                .from(StateEnum.STATE_WAIT_INIT)
+                .on(event);
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
 
         System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
     }
@@ -228,8 +240,8 @@ public class StateMachineFactoryTest {
         EventImpl<EventEnum> event = EventImpl.getInstance();
         event.eventId(EventEnum.EVENT_PROMO)
                 .payload("订单: xxxxxxx", "营销方案: 满100减50");
-        eventContext.stateId(StateEnum.STATE_WAIT_PROMO)
-                .event(event);
+        eventContext.from(StateEnum.STATE_WAIT_PROMO)
+                .on(event);
 //        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
         IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PROMO, EventEnum.EVENT_PROMO, "订单: xxxxxxx", "营销方案: 满100减50");
 
@@ -243,8 +255,8 @@ public class StateMachineFactoryTest {
         EventImpl<EventEnum> event = EventImpl.getInstance();
         event.eventId(EventEnum.EVENT_MODIFY_PRICE)
                 .payload("订单: xxxxxxx", "修改金额方案: 将金额修改为50");
-        eventContext.stateId(StateEnum.STATE_WAIT_PROMO)
-                .event(event);
+        eventContext.from(StateEnum.STATE_WAIT_PROMO)
+                .on(event);
 //        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
         IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PROMO, EventEnum.EVENT_MODIFY_PRICE, "订单: xxxxxxx", "修改金额方案: 将金额修改为50");
 
@@ -258,8 +270,8 @@ public class StateMachineFactoryTest {
         EventImpl<EventEnum> event = EventImpl.getInstance();
         event.eventId(EventEnum.EVENT_BALANCE)
                 .payload("订单: xxxxxxx", "结算: 计算后的金额10");
-        eventContext.stateId(StateEnum.STATE_WAIT_BALANCE)
-                .event(event);
+        eventContext.from(StateEnum.STATE_WAIT_BALANCE)
+                .on(event);
 //        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
         IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_BALANCE, EventEnum.EVENT_BALANCE, "订单: xxxxxxx", "结算: 计算后的金额10");
 
@@ -273,8 +285,8 @@ public class StateMachineFactoryTest {
         EventImpl<EventEnum> event = EventImpl.getInstance();
         event.eventId(EventEnum.EVENT_PAY)
                 .payload("订单: xxxxxxx", "支付金额: 10");
-        eventContext.stateId(StateEnum.STATE_WAIT_PAY)
-                .event(event);
+        eventContext.from(StateEnum.STATE_WAIT_PAY)
+                .on(event);
 //        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
         IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY, EventEnum.EVENT_PAY, "订单: xxxxxxx", "支付金额: 10");
 
@@ -288,8 +300,8 @@ public class StateMachineFactoryTest {
         EventImpl<EventEnum> event = EventImpl.getInstance();
         event.eventId(EventEnum.EVENT_BOOKING)
                 .payload("订单: xxxxxxx", "记账: 用户积分、信誉分改动");
-        eventContext.stateId(StateEnum.STATE_WAIT_BOOKING)
-                .event(event);
+        eventContext.from(StateEnum.STATE_WAIT_BOOKING)
+                .on(event);
 //        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
         IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_BOOKING, EventEnum.EVENT_BOOKING, "订单: xxxxxxx", "记账: 用户积分、信誉分改动");
 
@@ -303,8 +315,8 @@ public class StateMachineFactoryTest {
         EventImpl<EventEnum> event = EventImpl.getInstance();
         event.eventId(EventEnum.EVENT_CANCEL)
                 .payload("订单: xxxxxxx", "取消订单理由: 点错了");
-        eventContext.stateId(StateEnum.STATE_WAIT_PAY)
-                .event(event);
+        eventContext.from(StateEnum.STATE_WAIT_PAY)
+                .on(event);
 //        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
         IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY, EventEnum.EVENT_CANCEL, "订单: xxxxxxx", "取消订单理由: 点错了");
 
@@ -318,8 +330,8 @@ public class StateMachineFactoryTest {
         EventImpl<EventEnum> event = EventImpl.getInstance();
         event.eventId(EventEnum.EVENT_CLOSE)
                 .payload("订单: xxxxxxx", "关闭订单理由: 点错了");
-        eventContext.stateId(StateEnum.STATE_WAIT_PAY)
-                .event(event);
+        eventContext.from(StateEnum.STATE_WAIT_PAY)
+                .on(event);
 //        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
         IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY, EventEnum.EVENT_CLOSE, "订单: xxxxxxx", "关闭订单理由: 点错了");
 

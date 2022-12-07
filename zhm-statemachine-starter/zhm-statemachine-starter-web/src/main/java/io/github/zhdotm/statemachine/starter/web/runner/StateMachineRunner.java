@@ -3,7 +3,7 @@ package io.github.zhdotm.statemachine.starter.web.runner;
 import io.github.zhdotm.statemachine.model.domain.IStateMachine;
 import io.github.zhdotm.statemachine.model.domain.ITransition;
 import io.github.zhdotm.statemachine.model.support.StateMachineFactory;
-import io.github.zhdotm.statemachine.model.support.builder.StateMachineBuilder;
+import io.github.zhdotm.statemachine.model.support.builder.machine.IStateMachineBuilder;
 import io.github.zhdotm.statemachine.starter.web.adapter.ITransitionAdapter;
 import io.github.zhdotm.statemachine.starter.web.annotation.StateMachineComponent;
 import org.springframework.beans.BeansException;
@@ -30,7 +30,7 @@ public class StateMachineRunner implements ApplicationRunner, BeanFactoryPostPro
         Map<String, List<ITransition<String, String, String, String>>> stateMachineIdTransitionsMap = getStateMachineIdTransitionsMap();
 
         stateMachineIdTransitionsMap.forEach((stateMachineId, transitions) -> {
-            StateMachineBuilder<String, String, String, String, String> stateMachineBuilder = StateMachineFactory.create();
+            IStateMachineBuilder<String, String, String, String, String> stateMachineBuilder = StateMachineFactory.create();
             stateMachineBuilder.transitions(transitions);
             IStateMachine<String, String, String, String, String> stateMachine = stateMachineBuilder.build(stateMachineId);
 

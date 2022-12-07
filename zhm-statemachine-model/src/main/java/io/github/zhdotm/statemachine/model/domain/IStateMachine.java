@@ -88,8 +88,8 @@ public interface IStateMachine<M, S, E, C, A> {
         EventImpl<E> event = EventImpl.getInstance();
         event.eventId(eventId)
                 .payload(payload);
-        eventContext.stateId(stateId)
-                .event(event);
+        eventContext.from(stateId)
+                .on(event);
 
         return fireEvent(eventContext);
     }

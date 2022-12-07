@@ -32,8 +32,8 @@ public class StateMachineSupport implements BeanFactoryPostProcessor {
         EventImpl<E> event = EventImpl.getInstance();
         event.eventId(eventId)
                 .payload(payload);
-        eventContext.stateId(stateId)
-                .event(event);
+        eventContext.from(stateId)
+                .on(event);
 
         return fireEvent(stateMachineId, eventContext);
     }

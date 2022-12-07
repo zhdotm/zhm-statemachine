@@ -22,13 +22,13 @@ public class EventContextImpl<S, E> implements IEventContext<S, E> {
         return new EventContextImpl<>();
     }
 
-    public EventContextImpl<S, E> stateId(@NonNull S stateId) {
+    public EventContextImpl<S, E> from(@NonNull S stateId) {
         this.stateId = stateId;
 
         return this;
     }
 
-    public EventContextImpl<S, E> event(@NonNull IEvent<E> event) {
+    public EventContextImpl<S, E> on(@NonNull IEvent<E> event) {
         this.event = event;
 
         return this;

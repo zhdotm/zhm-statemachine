@@ -27,13 +27,13 @@ public class StateContextImpl<S, E> implements IStateContext<S, E> {
         return this;
     }
 
-    public StateContextImpl<S, E> result(Object payload) {
+    public StateContextImpl<S, E> ret(Object payload) {
         this.payload = payload;
 
         return this;
     }
 
-    public StateContextImpl<S, E> eventContext(@NonNull IEventContext<S, E> eventContext) {
+    public StateContextImpl<S, E> on(@NonNull IEventContext<S, E> eventContext) {
         this.eventContext = eventContext;
 
         return this;

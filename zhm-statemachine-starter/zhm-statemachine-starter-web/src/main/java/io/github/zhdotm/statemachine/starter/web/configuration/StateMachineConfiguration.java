@@ -19,19 +19,19 @@ import org.springframework.context.annotation.Configuration;
 public class StateMachineConfiguration {
 
     @Bean
-    public StateMachineProcessor stateMachineProcessor() {
+    public static StateMachineProcessor stateMachineProcessor() {
 
         return new StateMachineProcessor();
     }
 
     @Bean
-    public StateMachineRunner stateMachineRunner() {
+    public static StateMachineRunner stateMachineRunner() {
 
         return new StateMachineRunner();
     }
 
     @Bean
-    public StateMachineSupport stateMachineSupport() {
+    public static StateMachineSupport stateMachineSupport() {
 
         return new StateMachineSupport();
     }

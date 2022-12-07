@@ -2,8 +2,11 @@ package io.github.zhdotm.statemachine.model.domain;
 
 
 import io.github.zhdotm.statemachine.model.constant.TransitionTypeEnum;
-import io.github.zhdotm.statemachine.model.domain.impl.StateContextImpl;
 import io.github.zhdotm.statemachine.model.log.ProcessLog;
+import io.github.zhdotm.statemachine.model.support.StateContextFactory;
+import io.github.zhdotm.statemachine.model.support.builder.context.state.IStateContextBuilder;
+import io.github.zhdotm.statemachine.model.support.builder.context.state.IStateContextOnBuilder;
+import io.github.zhdotm.statemachine.model.support.builder.context.state.IStateContextToBuilder;
 import lombok.SneakyThrows;
 
 import java.util.Collection;
@@ -133,20 +136,20 @@ public interface ITransition<S, E, C, A> {
         Object result = action.invoke(eventContext.getEvent().getPayload());
         S toStateId = getToStateId();
 
-        StateContextImpl<S, E> stateContext = StateContextImpl.getInstance();
-        stateContext
-                .result(result)
-                .eventContext(eventContext);
+        IStateContextBuilder<S, E> stateContextBuilder = StateContextFactory.create();
+        IStateContextOnBuilder<S, E> stateContextOnBuilder = stateContextBuilder.on(eventContext);
 
+        IStateContextToBuilder<S, E> stateContextToBuilder = null;
         if (getType() == TransitionTypeEnum.EXTERNAL) {
 
-            stateContext.to(toStateId);
+            stateContextToBuilder = stateContextOnBuilder.to(toStateId);
         }
 
         if (getType() == TransitionTypeEnum.INTERNAL) {
 
-            stateContext.to(stateId);
+            stateContextToBuilder = stateContextOnBuilder.to(stateId);
         }
+        IStateContext<S, E> stateContext = stateContextToBuilder.ret(result);
 
         ProcessLog.info("状态机流程日志[%s, %s]: 执行结果[%s], 执行后状态[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), stateContext.getPayload(), stateContext.getStateId());
         return stateContext;
