@@ -19,6 +19,7 @@ public interface IStateMachine<M, S, E, C, A> {
 
     ThreadLocal<String> STATEMACHINE_ID_THREAD_LOCAL = new ThreadLocal<>();
     ThreadLocal<String> TRACE_ID_THREAD_LOCAL = new ThreadLocal<>();
+    ThreadLocal<String> CURRENT_STATE_THREAD_LOCAL = new ThreadLocal<>();
 
     /**
      * 获取状态机ID
@@ -102,8 +103,9 @@ public interface IStateMachine<M, S, E, C, A> {
      */
     @SneakyThrows
     default IStateContext<S, E> fireEvent(IEventContext<S, E> eventContext) {
-        STATEMACHINE_ID_THREAD_LOCAL.set(getStateMachineId().toString());
+        STATEMACHINE_ID_THREAD_LOCAL.set(String.valueOf(getStateMachineId()));
         TRACE_ID_THREAD_LOCAL.set(String.valueOf(System.currentTimeMillis()));
+        CURRENT_STATE_THREAD_LOCAL.set(String.valueOf(eventContext.getStateId()));
         IStateContext<S, E> stateContext = null;
         try {
             S stateId = eventContext.getStateId();
@@ -145,6 +147,7 @@ public interface IStateMachine<M, S, E, C, A> {
         } finally {
             STATEMACHINE_ID_THREAD_LOCAL.remove();
             TRACE_ID_THREAD_LOCAL.remove();
+            CURRENT_STATE_THREAD_LOCAL.remove();
         }
 
         return stateContext;

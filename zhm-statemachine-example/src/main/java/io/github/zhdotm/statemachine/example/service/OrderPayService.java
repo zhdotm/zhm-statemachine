@@ -25,14 +25,14 @@ public class OrderPayService implements ITransitionAdapter {
 
     @StateMachineCondition(conditionId = "IS_ABLE_PAY")
     public Boolean check(String arg) {
-        System.out.println("检查能否关闭订单");
+        System.out.println(getCurrentState() + ": 检查能否关闭订单");
 
         return Boolean.TRUE;
     }
 
     @StateMachineAction(actionId = "ACTION_PAY")
     public String execute(String arg) {
-        System.out.println("执行关闭订单动作");
+        System.out.println(getCurrentState() + ": 执行关闭订单动作");
 
         return "执行结束";
     }

@@ -3,6 +3,7 @@ package io.github.zhdotm.statemachine.starter.web.adapter;
 import io.github.zhdotm.statemachine.model.constant.TransitionTypeEnum;
 import io.github.zhdotm.statemachine.model.domain.IEvent;
 import io.github.zhdotm.statemachine.model.domain.IEventContext;
+import io.github.zhdotm.statemachine.model.domain.IStateMachine;
 import io.github.zhdotm.statemachine.model.domain.ITransition;
 import io.github.zhdotm.statemachine.model.domain.impl.ActionImpl;
 import io.github.zhdotm.statemachine.model.domain.impl.ConditionImpl;
@@ -25,6 +26,11 @@ import java.util.function.Function;
  */
 
 public interface ITransitionAdapter {
+
+    default String getCurrentState() {
+
+        return IStateMachine.CURRENT_STATE_THREAD_LOCAL.get();
+    }
 
     default ITransition<String, String, String, String> getTransition() {
         Object obj = this;

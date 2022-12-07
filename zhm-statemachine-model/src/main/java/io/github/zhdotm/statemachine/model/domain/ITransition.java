@@ -126,29 +126,27 @@ public interface ITransition<S, E, C, A> {
     @SneakyThrows
     default IStateContext<S, E> transfer(IEventContext<S, E> eventContext) {
         S stateId = eventContext.getStateId();
-        IEvent<E> event = eventContext.getEvent();
-        E eventId = event.getEventId();
-        Object[] payload = event.getPayload();
-        IAction<A> action = getAction();
-        A actionId = action.getActionId();
-
-        ProcessLog.info("状态机流程日志[%s, %s]: 成功匹配[%s]动作[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), getType().getDescription(), actionId);
-        Object result = action.invoke(eventContext.getEvent().getPayload());
         S toStateId = getToStateId();
-
         IStateContextBuilder<S, E> stateContextBuilder = StateContextFactory.create();
         IStateContextOnBuilder<S, E> stateContextOnBuilder = stateContextBuilder.on(eventContext);
-
         IStateContextToBuilder<S, E> stateContextToBuilder = null;
         if (getType() == TransitionTypeEnum.EXTERNAL) {
 
             stateContextToBuilder = stateContextOnBuilder.to(toStateId);
+            IStateMachine.CURRENT_STATE_THREAD_LOCAL.set(String.valueOf(toStateId));
         }
 
         if (getType() == TransitionTypeEnum.INTERNAL) {
 
             stateContextToBuilder = stateContextOnBuilder.to(stateId);
         }
+
+        IAction<A> action = getAction();
+        A actionId = action.getActionId();
+
+        ProcessLog.info("状态机流程日志[%s, %s]: 成功匹配[%s]动作[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), getType().getDescription(), actionId);
+        Object result = action.invoke(eventContext.getEvent().getPayload());
+
         IStateContext<S, E> stateContext = stateContextToBuilder.ret(result);
 
         ProcessLog.info("状态机流程日志[%s, %s]: 执行结果[%s], 执行后状态[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), stateContext.getPayload(), stateContext.getStateId());
