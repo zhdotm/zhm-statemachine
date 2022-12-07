@@ -12,7 +12,7 @@
 
 ### 与cola-statemachine的区别
 
-zhm-statemachine灵感来源于https://github.com/alibaba/COLA/tree/master/cola-components/cola-component-statemachine，并在其设计思想的前提下，做了部分改动。
+zhm-statemachine灵感来源于https://github.com/alibaba/COLA/tree/master/cola-components/cola-component-statemachine ，并在其设计思想的前提下，做了部分改动。
 
 #### 1、统一外部流转、内部流转、批量流转的语法
 
