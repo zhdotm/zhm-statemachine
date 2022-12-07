@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public interface IStateMachine<M, S, E, C, A> {
 
     ThreadLocal<String> STATEMACHINE_ID_THREAD_LOCAL = new ThreadLocal<>();
+    ThreadLocal<String> TRACE_ID_THREAD_LOCAL = new ThreadLocal<>();
 
     /**
      * 获取状态机ID
@@ -102,6 +103,7 @@ public interface IStateMachine<M, S, E, C, A> {
     @SneakyThrows
     default IStateContext<S, E> fireEvent(IEventContext<S, E> eventContext) {
         STATEMACHINE_ID_THREAD_LOCAL.set(getStateMachineId().toString());
+        TRACE_ID_THREAD_LOCAL.set(String.valueOf(System.currentTimeMillis()));
         IStateContext<S, E> stateContext = null;
         try {
             S stateId = eventContext.getStateId();
@@ -109,13 +111,13 @@ public interface IStateMachine<M, S, E, C, A> {
             E eventId = event.getEventId();
             Object[] payload = event.getPayload();
 
-            ProcessLog.info("流程日志[%s]: 状态[%s]收到事件[%s]携带负载[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload));
+            ProcessLog.info("状态机流程日志[%s, %s]: 状态[%s]收到携带负载[%s]的事件[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), stateId, Arrays.toString(payload), eventId);
 
             IState<S, E> state = getState(stateId);
-            ExceptionUtil.isTrue(state != null, StateMachineException.class, "状态机[%s]发布事件[%s]失败: 不存在对应的状态[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), eventId, stateId);
+            ExceptionUtil.isTrue(state != null, StateMachineException.class, "状态机[%s, %s]发布事件[%s]失败: 不存在对应的状态[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), eventId, stateId);
 
             Collection<E> eventIds = state.getEventIds();
-            ExceptionUtil.isTrue(eventIds.contains(eventId), StateMachineException.class, "状态机[%s]发布事件[%s]失败: 对应状态[%s]不存在指定事件[%S]", STATEMACHINE_ID_THREAD_LOCAL.get(), eventId, stateId, eventId);
+            ExceptionUtil.isTrue(eventIds.contains(eventId), StateMachineException.class, "状态机[%s, %s]发布事件[%s]失败: 对应状态[%s]不存在指定事件[%S]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), eventId, stateId, eventId);
 
             List<ITransition<S, E, C, A>> satisfiedInternalTransitions = Optional.ofNullable(getInternalTransition(stateId, eventId))
                     .orElse(new ArrayList<>())
@@ -130,7 +132,7 @@ public interface IStateMachine<M, S, E, C, A> {
                     .filter(transition -> transition.getCondition().isSatisfied(eventContext))
                     .collect(Collectors.toList());
 
-            ExceptionUtil.isTrue(satisfiedExternalTransitions.size() <= 1, StateMachineException.class, "发布事件[%s]失败: 状态[%s]指定事件[%S]对应的符合条件的外部转换超过一个", eventId, stateId, eventId);
+            ExceptionUtil.isTrue(satisfiedExternalTransitions.size() <= 1, StateMachineException.class, "状态机[%s]发布事件[%s]失败: 状态[%s]指定事件[%S]对应的符合条件的外部转换超过一个", STATEMACHINE_ID_THREAD_LOCAL.get(), eventId, stateId, eventId);
 
             for (ITransition<S, E, C, A> internalTransition : satisfiedInternalTransitions) {
                 stateContext = internalTransition.transfer(eventContext);
@@ -142,6 +144,7 @@ public interface IStateMachine<M, S, E, C, A> {
             }
         } finally {
             STATEMACHINE_ID_THREAD_LOCAL.remove();
+            TRACE_ID_THREAD_LOCAL.remove();
         }
 
         return stateContext;

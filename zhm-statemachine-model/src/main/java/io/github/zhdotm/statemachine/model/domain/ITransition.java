@@ -6,7 +6,6 @@ import io.github.zhdotm.statemachine.model.domain.impl.StateContextImpl;
 import io.github.zhdotm.statemachine.model.log.ProcessLog;
 import lombok.SneakyThrows;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -130,10 +129,9 @@ public interface ITransition<S, E, C, A> {
         IAction<A> action = getAction();
         A actionId = action.getActionId();
 
-        ProcessLog.info("流程日志[%s]: 状态[%s]触发事件[%s]携带负载[%s]成功匹配[%s]动作[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload), getType(), actionId);
+        ProcessLog.info("状态机流程日志[%s, %s]: 成功匹配[%s]动作[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), getType().getDescription(), actionId);
         Object result = action.invoke(eventContext.getEvent().getPayload());
         S toStateId = getToStateId();
-        ProcessLog.info("流程日志[%s]: 状态[%s]触发事件[%s]携带负载[%s]执行[%s]动作[%s]执行结果[%s]状态转换[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), stateId, eventId, Arrays.toString(payload), getType(), actionId, result, toStateId);
 
         StateContextImpl<S, E> stateContext = StateContextImpl.getInstance();
         stateContext
@@ -150,6 +148,7 @@ public interface ITransition<S, E, C, A> {
             stateContext.to(stateId);
         }
 
+        ProcessLog.info("状态机流程日志[%s, %s]: 执行结果[%s], 执行后状态[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), stateContext.getPayload(), stateContext.getStateId());
         return stateContext;
     }
 }

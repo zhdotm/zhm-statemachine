@@ -31,14 +31,14 @@ public interface ITransitionAdapter {
         Class<?> clazz = this.getClass();
         String clazzName = clazz.getName();
         StateMachineComponent stateMachineComponent = clazz.getDeclaredAnnotation(StateMachineComponent.class);
-        ExceptionUtil.isTrue(stateMachineComponent != null, StateMachineException.class, "获取转换失败: [%s]类上不存在@StateMachineComponent", clazzName);
+        ExceptionUtil.isTrue(stateMachineComponent != null, StateMachineException.class, "获取转换失败: 类[%s]不存在@StateMachineComponent", clazzName);
         Method conditionMethod = getConditionMethod();
         String conditionMethodName = conditionMethod.getName();
         Class<?>[] conditionMethodParameterTypes = conditionMethod.getParameterTypes();
         Method actionMethod = getActionMethod();
         String actionMethodName = getActionMethod().getName();
         Class<?>[] actionMethodParameterTypes = actionMethod.getParameterTypes();
-        ExceptionUtil.isTrue(matchMethodParameterTypes(conditionMethodParameterTypes, actionMethodParameterTypes), StateMachineException.class, "获取转换失败: [%s]类上的[%s]条件方法的参数和[%s]动作方法的参数不匹配", clazzName, conditionMethodName, actionMethodName);
+        ExceptionUtil.isTrue(matchMethodParameterTypes(conditionMethodParameterTypes, actionMethodParameterTypes), StateMachineException.class, "获取转换失败: 类[%s]的条件方法[%s]的参数和动作方法[%s]的参数不匹配", clazzName, conditionMethodName, actionMethodName);
 
         TransitionImpl<String, String, String, String> transition = TransitionImpl.getInstance();
         ConditionImpl<String, String, String> condition = ConditionImpl.getInstance();
@@ -98,7 +98,7 @@ public interface ITransitionAdapter {
         Class<?> clazz = this.getClass();
         String clazzName = clazz.getName();
         StateMachineComponent stateMachineComponent = clazz.getDeclaredAnnotation(StateMachineComponent.class);
-        ExceptionUtil.isTrue(stateMachineComponent != null, StateMachineException.class, "获取stateMachineId失败: [%s]类上不存在@StateMachineComponent", clazzName);
+        ExceptionUtil.isTrue(stateMachineComponent != null, StateMachineException.class, "获取stateMachineId失败: 类[%s]不存在@StateMachineComponent", clazzName);
 
         return stateMachineComponent.stateMachineId();
     }
@@ -116,7 +116,7 @@ public interface ITransitionAdapter {
         Method method = getStateMachineComponentMethod(StateMachineCondition.class);
         String methodName = method.getName();
         Class<?> returnType = method.getReturnType();
-        ExceptionUtil.isTrue(returnType == Boolean.class, StateMachineException.class, "[%s]类上的[%s]条件方法返回值不为Boolean类型", clazzName, methodName);
+        ExceptionUtil.isTrue(returnType == Boolean.class, StateMachineException.class, "获取条件方法失败: 类[%s]的条件方法[%s]的返回值不为Boolean类型", clazzName, methodName);
 
         return method;
     }
@@ -134,7 +134,7 @@ public interface ITransitionAdapter {
     }
 
     default Method getStateMachineComponentMethod(Class<? extends Annotation> annotationClazz) {
-        ExceptionUtil.isTrue(annotationClazz == StateMachineCondition.class || annotationClazz == StateMachineAction.class, StateMachineException.class, "TransitionAdapter.getStateMachineComponentMethod只支持@StateMachineCondition、@StateMachineAction");
+        ExceptionUtil.isTrue(annotationClazz == StateMachineCondition.class || annotationClazz == StateMachineAction.class, StateMachineException.class, "获取状态机组件方法失败: 只支持@StateMachineCondition、@StateMachineAction");
         Class<?> clazz = this.getClass();
         String clazzName = clazz.getName();
         StateMachineComponent stateMachineComponent = clazz.getDeclaredAnnotation(StateMachineComponent.class);
@@ -151,11 +151,11 @@ public interface ITransitionAdapter {
 
                 continue;
             }
-            ExceptionUtil.isTrue(targetMethod == null, StateMachineException.class, "[%s]类的方法上存在多个[%s]注解", clazzName, annotationClazz.getName());
+            ExceptionUtil.isTrue(targetMethod == null, StateMachineException.class, "获取状态机组件方法失败: 类[%s]存在多个指定注解[%s]的方法", clazzName, annotationClazz.getName());
             targetMethod = method;
         }
 
-        ExceptionUtil.isTrue(targetMethod != null, StateMachineException.class, "[%s]类的方法上不存在[%s]注解", clazzName, annotationClazz.getName());
+        ExceptionUtil.isTrue(targetMethod != null, StateMachineException.class, "获取状态机组件方法失败: 类[%s]不存在指定注解[%s]的方法", clazzName, annotationClazz.getName());
 
         return targetMethod;
     }
@@ -168,11 +168,11 @@ public interface ITransitionAdapter {
                 .orElse(new Object[0]);
         int payloadLength = payload.length;
         int parameterTypesLength = parameterTypes.length;
-        ExceptionUtil.isTrue(payloadLength <= parameterTypesLength, StateMachineException.class, "事件负载[%s]转换为[%s]类的[%s]方法的执行参数失败: 事件负载参数个数大于执行参数个数", Arrays.toString(payload), clazzName, methodName);
+        ExceptionUtil.isTrue(payloadLength <= parameterTypesLength, StateMachineException.class, "事件负载[%s]转换为类[%s]的方法[%s]的执行参数失败: 事件负载参数个数大于执行参数个数", Arrays.toString(payload), clazzName, methodName);
         Object[] args = new Object[parameterTypesLength];
         for (int i = 0; i < args.length; i++) {
             if (i < payloadLength) {
-                ExceptionUtil.isTrue(payload[i].getClass() == parameterTypes[i], StateMachineException.class, "事件负载[%s]转换为[%s]类的[%s]方法的执行参数失败: 参数类型不匹配", Arrays.toString(payload), clazzName, methodName);
+                ExceptionUtil.isTrue(payload[i].getClass() == parameterTypes[i], StateMachineException.class, "事件负载[%s]转换为类[%s]的方法[%s]的执行参数失败: 参数类型不匹配", Arrays.toString(payload), clazzName, methodName);
                 args[i] = payload[i];
             }
         }
