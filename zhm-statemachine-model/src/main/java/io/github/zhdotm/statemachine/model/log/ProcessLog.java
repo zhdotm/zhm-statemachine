@@ -24,8 +24,8 @@ public class ProcessLog {
         log.warn(String.format(format, args));
     }
 
-    public static void error(String format, Object... args) {
+    public static void error(Throwable throwable, String format, Object... args) {
 
-        log.error(String.format(format, args));
+        log.error(String.format(format, args), throwable);
     }
 }
