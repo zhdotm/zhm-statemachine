@@ -113,7 +113,7 @@ public interface IStateMachine<M, S, E, C, A> {
             E eventId = event.getEventId();
             Object[] payload = event.getPayload();
 
-            ProcessLog.info("状态机流程日志[%s, %s]: 状态[%s]收到携带负载[%s]的事件[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), stateId, Arrays.toString(payload), eventId);
+            ProcessLog.info("状态机流程日志[%s, %s]: 当前状态[%s]收到携带负载[%s]的事件[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), stateId, Arrays.toString(payload), eventId);
 
             IState<S, E> state = getState(stateId);
             ExceptionUtil.isTrue(state != null, StateMachineException.class, "状态机[%s, %s]发布事件[%s]失败: 不存在对应的状态[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), eventId, stateId);

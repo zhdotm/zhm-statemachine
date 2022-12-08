@@ -149,7 +149,7 @@ public interface ITransition<S, E, C, A> {
 
         IStateContext<S, E> stateContext = stateContextToBuilder.ret(result);
 
-        ProcessLog.info("状态机流程日志[%s, %s]: 执行结果[%s], 执行后状态[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), stateContext.getPayload(), stateContext.getStateId());
+        ProcessLog.info("状态机流程日志[%s, %s]: 执行结果[%s], 转换后状态[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), stateContext.getPayload(), stateContext.getStateId());
         return stateContext;
     }
 }
