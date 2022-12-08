@@ -19,7 +19,7 @@ public class StateMachineSupport implements BeanFactoryPostProcessor {
 
     public static <M, S, E, C, A> IStateMachine<M, S, E, C, A> getStateMachine(M stateMachineId) {
 
-        return beanFactory.getBean(stateMachineId.toString(), IStateMachine.class);
+        return beanFactory.getBean(String.valueOf(stateMachineId), IStateMachine.class);
     }
 
     public static <M, S, E, C, A> void registerStateMachine(IStateMachine<M, S, E, C, A> stateMachine) {
@@ -38,7 +38,7 @@ public class StateMachineSupport implements BeanFactoryPostProcessor {
         return fireEvent(stateMachineId, eventContext);
     }
 
-    private static <M, S, E, C, A> IStateContext<S, E> fireEvent(M stateMachineId, IEventContext<S, E> eventContext) {
+    public static <M, S, E, C, A> IStateContext<S, E> fireEvent(M stateMachineId, IEventContext<S, E> eventContext) {
         IStateMachine<M, S, E, C, A> stateMachine = getStateMachine(stateMachineId);
 
         return stateMachine.fireEvent(eventContext);
