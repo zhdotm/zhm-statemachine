@@ -236,14 +236,22 @@ public class StateMachineFactoryTest {
     @Test
     public void promo() {
         //02、营销
-        EventContextImpl<StateEnum, EventEnum> eventContext = EventContextImpl.getInstance();
-        EventImpl<EventEnum> event = EventImpl.getInstance();
-        event.eventId(EventEnum.EVENT_PROMO)
-                .payload("订单: xxxxxxx", "营销方案: 满100减50");
-        eventContext.from(StateEnum.STATE_WAIT_PROMO)
+//        EventContextImpl<StateEnum, EventEnum> eventContext = EventContextImpl.getInstance();
+//        EventImpl<EventEnum> event = EventImpl.getInstance();
+//        event.eventId(EventEnum.EVENT_PROMO)
+//                .payload("订单: xxxxxxx", "营销方案: 满100减50");
+//        eventContext.from(StateEnum.STATE_WAIT_PROMO)
+//                .on(event);
+////        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PROMO, EventEnum.EVENT_PROMO, "订单: xxxxxxx", "营销方案: 满100减50");
+
+        IEventContextBuilder<StateEnum, EventEnum> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<EventEnum> eventBuilder = EventFactory.create();
+        IEvent<EventEnum> event = eventBuilder.payload("订单: xxxxxxx", "营销方案: 满100减50")
+                .build(EventEnum.EVENT_PROMO);
+        IEventContext<StateEnum, EventEnum> eventContext = eventContextBuilder.from(StateEnum.STATE_WAIT_PROMO)
                 .on(event);
-//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
-        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PROMO, EventEnum.EVENT_PROMO, "订单: xxxxxxx", "营销方案: 满100减50");
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
 
         System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
     }

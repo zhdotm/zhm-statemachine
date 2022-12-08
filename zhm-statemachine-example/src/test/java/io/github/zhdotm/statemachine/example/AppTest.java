@@ -1,7 +1,13 @@
 package io.github.zhdotm.statemachine.example;
 
 import com.alibaba.fastjson.JSON;
+import io.github.zhdotm.statemachine.model.domain.IEvent;
+import io.github.zhdotm.statemachine.model.domain.IEventContext;
 import io.github.zhdotm.statemachine.model.domain.IStateContext;
+import io.github.zhdotm.statemachine.model.support.EventContextFactory;
+import io.github.zhdotm.statemachine.model.support.EventFactory;
+import io.github.zhdotm.statemachine.model.support.builder.context.event.IEventContextBuilder;
+import io.github.zhdotm.statemachine.model.support.builder.event.IEventBuilder;
 import io.github.zhdotm.statemachine.starter.web.support.StateMachineSupport;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,8 +27,19 @@ public class AppTest {
      */
     @Test
     public void close() {
-        IStateContext<String, String> stateContext = StateMachineSupport
-                .fireEvent("RENT_ORDER", "STATE_WAIT_PROMO", "EVENT_CLOSE", "orderId:123456789");
+
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:123456789")
+                .build("EVENT_CLOSE");
+        IEventContext<String, String> eventContext = eventContextBuilder.from("STATE_WAIT_PROMO")
+                .on(event);
+
+//        IStateContext<String, String> stateContext = StateMachineSupport
+//                .fireEvent("RENT_ORDER", "STATE_WAIT_PROMO", "EVENT_CLOSE", "orderId:123456789");
+
+        IStateContext<String, String> stateContext = StateMachineSupport.fireEvent("RENT_ORDER", eventContext);
 
         System.out.println(JSON.toJSONString(stateContext));
     }
