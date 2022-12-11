@@ -13,5 +13,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface StateMachineCondition {
 
-    String conditionId();
+    String conditionId() default "";
 }

@@ -5,7 +5,7 @@ import io.github.zhdotm.statemachine.model.domain.impl.EventContextImpl;
 import io.github.zhdotm.statemachine.model.domain.impl.EventImpl;
 import io.github.zhdotm.statemachine.model.exception.StateMachineException;
 import io.github.zhdotm.statemachine.model.exception.util.ExceptionUtil;
-import io.github.zhdotm.statemachine.model.log.ProcessLog;
+import io.github.zhdotm.statemachine.model.log.StateMachineLog;
 import lombok.SneakyThrows;
 
 import java.util.*;
@@ -113,7 +113,7 @@ public interface IStateMachine<M, S, E, C, A> {
             E eventId = event.getEventId();
             Object[] payload = event.getPayload();
 
-            ProcessLog.info("状态机流程日志[%s, %s]: 当前状态[%s]收到携带负载[%s]的事件[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), stateId, Arrays.toString(payload), eventId);
+            StateMachineLog.info("状态机流程日志[%s, %s]: 当前状态[%s]收到携带负载[%s]的事件[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), stateId, Arrays.toString(payload), eventId);
 
             IState<S, E> state = getState(stateId);
             ExceptionUtil.isTrue(state != null, StateMachineException.class, "状态机[%s, %s]发布事件[%s]失败: 不存在对应的状态[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), eventId, stateId);
@@ -151,6 +151,49 @@ public interface IStateMachine<M, S, E, C, A> {
         }
 
         return stateContext;
+    }
+
+    /**
+     * 打印状态机内部结构
+     */
+    default void print() {
+        StateMachineLog.info(StateMachineLog.tail("状态机结构日志: ---状态机[" + getStateMachineId() + "]", 100, "开始"));
+        getStateIds()
+                .forEach(stationId -> {
+                    StateMachineLog.info(StateMachineLog.tail("状态机结构日志: ------状态[" + stationId + "]", 90, "开始"));
+                    IState<S, E> state = getState(stationId);
+                    state.getEventIds()
+                            .forEach(eventId -> {
+                                StateMachineLog.info(StateMachineLog.tail("状态机结构日志: ---------事件[" + eventId + "]", 80, "开始"));
+                                List<ITransition<S, E, C, A>> internalTransitions = getInternalTransition(stationId, eventId);
+                                if (internalTransitions != null && internalTransitions.size() > 0) {
+                                    StateMachineLog.info(StateMachineLog.tail("状态机结构日志: ------------内部转换", 70, "开始"));
+                                    for (ITransition<S, E, C, A> internalTransition : internalTransitions) {
+                                        C conditionId = internalTransition.getCondition().getConditionId();
+                                        StateMachineLog.info("状态机结构日志: ---------------判断条件[%s]", conditionId);
+                                        A actionId = internalTransition.getAction().getActionId();
+                                        StateMachineLog.info("状态机结构日志: ------------------执行动作[%s]", actionId);
+                                    }
+                                    StateMachineLog.info(StateMachineLog.tail("状态机结构日志: ------------内部转换", 70, "结束"));
+                                }
+                                List<ITransition<S, E, C, A>> externalTransitions = getExternalTransition(stationId, eventId);
+                                if (externalTransitions != null && externalTransitions.size() > 0) {
+                                    StateMachineLog.info(StateMachineLog.tail("状态机结构日志: ------------外部转换", 70, "开始"));
+                                    for (ITransition<S, E, C, A> externalTransition : externalTransitions) {
+                                        C conditionId = externalTransition.getCondition().getConditionId();
+                                        StateMachineLog.info("状态机结构日志: ---------------判断条件[%s]", conditionId);
+                                        A actionId = externalTransition.getAction().getActionId();
+                                        StateMachineLog.info("状态机结构日志: ------------------执行动作[%s]", actionId);
+                                        S toStateId = externalTransition.getToStateId();
+                                        StateMachineLog.info("状态机结构日志: ------------------转换状态[%s]", toStateId);
+                                    }
+                                    StateMachineLog.info(StateMachineLog.tail("状态机结构日志: ------------外部转换", 70, "结束"));
+                                }
+                                StateMachineLog.info(StateMachineLog.tail("状态机结构日志: ---------事件[" + eventId + "]", 80, "结束"));
+                            });
+                    StateMachineLog.info(StateMachineLog.tail("状态机结构日志: ------状态[" + stationId + "]", 90, "结束"));
+                });
+        StateMachineLog.info(StateMachineLog.tail("状态机结构日志: ---状态机[" + getStateMachineId() + "]", 100, "结束"));
     }
 
 }

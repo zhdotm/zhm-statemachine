@@ -14,4 +14,8 @@ public class StateMachineConfigurationProperties {
     @Getter
     @Setter
     private Boolean enable = Boolean.FALSE;
+
+    @Getter
+    @Setter
+    private Boolean print = Boolean.FALSE;
 }

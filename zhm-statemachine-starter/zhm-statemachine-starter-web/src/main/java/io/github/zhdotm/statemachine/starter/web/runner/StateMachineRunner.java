@@ -6,8 +6,10 @@ import io.github.zhdotm.statemachine.model.support.StateMachineFactory;
 import io.github.zhdotm.statemachine.model.support.builder.machine.IStateMachineBuilder;
 import io.github.zhdotm.statemachine.starter.web.adapter.ITransitionAdapter;
 import io.github.zhdotm.statemachine.starter.web.annotation.StateMachineComponent;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import io.github.zhdotm.statemachine.starter.web.configuration.properties.StateMachineConfigurationProperties;
+import io.github.zhdotm.statemachine.starter.web.support.StateMachineSupport;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -21,9 +23,11 @@ import java.util.Map;
  * @author zhihao.mao
  */
 
-public class StateMachineRunner implements ApplicationRunner, BeanFactoryPostProcessor {
+@Slf4j
+public class StateMachineRunner implements ApplicationRunner {
 
-    private ConfigurableListableBeanFactory beanFactory;
+    @Autowired
+    private StateMachineConfigurationProperties stateMachineConfigurationProperties;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -34,18 +38,20 @@ public class StateMachineRunner implements ApplicationRunner, BeanFactoryPostPro
             stateMachineBuilder.transitions(transitions);
             IStateMachine<String, String, String, String, String> stateMachine = stateMachineBuilder.build(stateMachineId);
 
-            registerStateMachine(stateMachineId, stateMachine);
+            if (stateMachineConfigurationProperties.getPrint()) {
+                log.info("打印状态机[{}]内部结构: 开始", stateMachineId);
+                stateMachine.print();
+                log.info("打印状态机[{}]内部结构: 结束", stateMachineId);
+            }
+
+            StateMachineSupport.registerStateMachine(stateMachine);
         });
-    }
-
-    private void registerStateMachine(String stateMachineId, IStateMachine<String, String, String, String, String> stateMachine) {
-
-        beanFactory.registerSingleton(stateMachineId, stateMachine);
     }
 
     private Map<String, List<ITransition<String, String, String, String>>> getStateMachineIdTransitionsMap() {
         Map<String, List<ITransition<String, String, String, String>>> stateMachineIdTransitionsMap = new HashMap<>();
 
+        ConfigurableListableBeanFactory beanFactory = StateMachineSupport.getBeanFactory();
         Map<String, Object> beansWithAnnotation = beanFactory.getBeansWithAnnotation(StateMachineComponent.class);
         for (Object bean : beansWithAnnotation.values()) {
             ITransitionAdapter transitionAdapter = (ITransitionAdapter) bean;
@@ -57,12 +63,6 @@ public class StateMachineRunner implements ApplicationRunner, BeanFactoryPostPro
         }
 
         return stateMachineIdTransitionsMap;
-    }
-
-    @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory configurableListableBeanFactory) throws BeansException {
-
-        beanFactory = configurableListableBeanFactory;
     }
 
 }

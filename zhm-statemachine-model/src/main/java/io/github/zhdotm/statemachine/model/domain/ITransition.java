@@ -2,7 +2,7 @@ package io.github.zhdotm.statemachine.model.domain;
 
 
 import io.github.zhdotm.statemachine.model.constant.TransitionTypeEnum;
-import io.github.zhdotm.statemachine.model.log.ProcessLog;
+import io.github.zhdotm.statemachine.model.log.StateMachineLog;
 import io.github.zhdotm.statemachine.model.support.StateContextFactory;
 import io.github.zhdotm.statemachine.model.support.builder.context.state.IStateContextBuilder;
 import io.github.zhdotm.statemachine.model.support.builder.context.state.IStateContextOnBuilder;
@@ -144,12 +144,13 @@ public interface ITransition<S, E, C, A> {
         IAction<A> action = getAction();
         A actionId = action.getActionId();
 
-        ProcessLog.info("状态机流程日志[%s, %s]: 成功匹配[%s]动作[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), getType().getDescription(), actionId);
+        StateMachineLog.info("状态机流程日志[%s, %s]: 成功匹配[%s]动作[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), getType().getDescription(), actionId);
         Object result = action.invoke(eventContext.getEvent().getPayload());
 
         IStateContext<S, E> stateContext = stateContextToBuilder.ret(result);
 
-        ProcessLog.info("状态机流程日志[%s, %s]: 执行结果[%s], 转换后状态[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), stateContext.getPayload(), stateContext.getStateId());
+        StateMachineLog.info("状态机流程日志[%s, %s]: 执行结果[%s], 转换后状态[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), stateContext.getPayload(), stateContext.getStateId());
+
         return stateContext;
     }
 }

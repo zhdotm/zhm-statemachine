@@ -112,8 +112,9 @@ public interface ITransitionAdapter {
     default String getConditionId() {
         Method conditionMethod = getConditionMethod();
         StateMachineCondition stateMachineCondition = conditionMethod.getDeclaredAnnotation(StateMachineCondition.class);
+        String conditionId = stateMachineCondition.conditionId();
 
-        return stateMachineCondition.conditionId();
+        return conditionId.length() == 0 ? conditionMethod.getName() : conditionId;
     }
 
     default Method getConditionMethod() {
@@ -130,8 +131,9 @@ public interface ITransitionAdapter {
     default String getActionId() {
         Method actionMethod = getActionMethod();
         StateMachineAction stateMachineAction = actionMethod.getDeclaredAnnotation(StateMachineAction.class);
+        String actionId = stateMachineAction.actionId();
 
-        return stateMachineAction.actionId();
+        return actionId.length() == 0 ? actionMethod.getName() : actionId;
     }
 
     default Method getActionMethod() {

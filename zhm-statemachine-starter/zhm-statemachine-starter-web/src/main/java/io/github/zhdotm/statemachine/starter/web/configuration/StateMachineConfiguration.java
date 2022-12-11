@@ -25,15 +25,15 @@ public class StateMachineConfiguration {
     }
 
     @Bean
-    public static StateMachineRunner stateMachineRunner() {
-
-        return new StateMachineRunner();
-    }
-
-    @Bean
     public static StateMachineSupport stateMachineSupport() {
 
         return new StateMachineSupport();
+    }
+
+    @Bean
+    public StateMachineRunner stateMachineRunner() {
+
+        return new StateMachineRunner();
     }
 
 }

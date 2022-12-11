@@ -13,5 +13,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface StateMachineAction {
 
-    String actionId();
+    String actionId() default "";
 }

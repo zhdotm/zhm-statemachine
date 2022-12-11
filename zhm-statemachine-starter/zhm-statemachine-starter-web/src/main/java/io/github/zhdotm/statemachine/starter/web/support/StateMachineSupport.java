@@ -5,6 +5,7 @@ import io.github.zhdotm.statemachine.model.domain.IStateContext;
 import io.github.zhdotm.statemachine.model.domain.IStateMachine;
 import io.github.zhdotm.statemachine.model.domain.impl.EventContextImpl;
 import io.github.zhdotm.statemachine.model.domain.impl.EventImpl;
+import lombok.Getter;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 public class StateMachineSupport implements BeanFactoryPostProcessor {
 
+    @Getter
     private static ConfigurableListableBeanFactory beanFactory;
 
     public static <M, S, E, C, A> IStateMachine<M, S, E, C, A> getStateMachine(M stateMachineId) {

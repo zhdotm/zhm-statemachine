@@ -1,3 +1,4 @@
 zhm:
   statemachine:
     enable: true
+    print: true
