@@ -275,7 +275,7 @@ public class OrderBalanceService implements ITransitionAdapter {
 <dependency>
     <groupId>io.github.zhdotm</groupId>
     <artifactId>zhm-statemachine-model</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.3</version>
 </dependency>
 ```
 
@@ -771,7 +771,7 @@ public void close(){
 <dependency>
     <groupId>io.github.zhdotm</groupId>
     <artifactId>zhm-statemachine-starter-web</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.3</version>
 </dependency>
 ```
 
