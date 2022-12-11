@@ -463,7 +463,28 @@ enum ActionEnum {
 }
 ```
 
-##### 7、构建状态机
+##### 7、构建一个事件
+
+```java
+IEventBuilder<String> eventBuilder = EventFactory.create();
+IEvent<String> event = eventBuilder
+        .payload("orderId:123456789")
+        .build("EVENT_CLOSE");
+```
+
+##### 8、构建一个事件上下文
+
+```java
+IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+IEventBuilder<String> eventBuilder = EventFactory.create();
+IEvent<String> event = eventBuilder
+        .payload("orderId:123456789")
+        .build("EVENT_CLOSE");
+IEventContext<String, String> eventContext = eventContextBuilder.from("STATE_WAIT_PROMO")
+        .on(event);
+```
+
+##### 9、构建状态机
 
 ```java
 public void build(){
@@ -655,111 +676,24 @@ public void build(){
 
 ##### 8、发送事件
 
+###### 8.1、使用事件上下文发送
+
 ```java
-    @Test
-public void promo(){
-        //02、营销
-        EventContextImpl<StateEnum, EventEnum> eventContext=EventContextImpl.getInstance();
-        EventImpl<EventEnum> event=EventImpl.getInstance();
-        event.eventId(EventEnum.EVENT_PROMO)
-        .payload("订单: xxxxxxx","营销方案: 满100减50");
-        eventContext.stateId(StateEnum.STATE_WAIT_PROMO)
-        .event(event);
-//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
-        IStateContext<StateEnum, EventEnum> stateContext=stateMachine.fireEvent(StateEnum.STATE_WAIT_PROMO,EventEnum.EVENT_PROMO,"订单: xxxxxxx","营销方案: 满100减50");
+        //发送事件上下文发送所有信息
+        IEventContextBuilder<StateEnum, EventEnum> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<EventEnum> eventBuilder = EventFactory.create();
+        IEvent<EventEnum> event = eventBuilder.payload("订单: xxxxxxx", "支付金额: 10")
+                .build(EventEnum.EVENT_PAY);
+        IEventContext<StateEnum, EventEnum> eventContext = eventContextBuilder
+                .from(StateEnum.STATE_WAIT_PAY)
+                .on(event);
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+```
 
-        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n",stateContext.getStateId(),stateContext.getPayload());
-        }
+###### 8.2、原生发送
 
-@Test
-public void modifyPrice(){
-        //03、修改金额
-        EventContextImpl<StateEnum, EventEnum> eventContext=EventContextImpl.getInstance();
-        EventImpl<EventEnum> event=EventImpl.getInstance();
-        event.eventId(EventEnum.EVENT_MODIFY_PRICE)
-        .payload("订单: xxxxxxx","修改金额方案: 将金额修改为50");
-        eventContext.stateId(StateEnum.STATE_WAIT_PROMO)
-        .event(event);
-//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
-        IStateContext<StateEnum, EventEnum> stateContext=stateMachine.fireEvent(StateEnum.STATE_WAIT_PROMO,EventEnum.EVENT_MODIFY_PRICE,"订单: xxxxxxx","修改金额方案: 将金额修改为50");
-
-        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n",stateContext.getStateId(),stateContext.getPayload());
-        }
-
-@Test
-public void balance(){
-        //04、结算
-        EventContextImpl<StateEnum, EventEnum> eventContext=EventContextImpl.getInstance();
-        EventImpl<EventEnum> event=EventImpl.getInstance();
-        event.eventId(EventEnum.EVENT_BALANCE)
-        .payload("订单: xxxxxxx","结算: 计算后的金额10");
-        eventContext.stateId(StateEnum.STATE_WAIT_BALANCE)
-        .event(event);
-//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
-        IStateContext<StateEnum, EventEnum> stateContext=stateMachine.fireEvent(StateEnum.STATE_WAIT_BALANCE,EventEnum.EVENT_BALANCE,"订单: xxxxxxx","结算: 计算后的金额10");
-
-        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n",stateContext.getStateId(),stateContext.getPayload());
-        }
-
-@Test
-public void pay(){
-        //05、支付
-        EventContextImpl<StateEnum, EventEnum> eventContext=EventContextImpl.getInstance();
-        EventImpl<EventEnum> event=EventImpl.getInstance();
-        event.eventId(EventEnum.EVENT_PAY)
-        .payload("订单: xxxxxxx","支付金额: 10");
-        eventContext.stateId(StateEnum.STATE_WAIT_PAY)
-        .event(event);
-//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
-        IStateContext<StateEnum, EventEnum> stateContext=stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY,EventEnum.EVENT_PAY,"订单: xxxxxxx","支付金额: 10");
-
-        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n",stateContext.getStateId(),stateContext.getPayload());
-        }
-
-@Test
-public void booking(){
-        //06、记账
-        EventContextImpl<StateEnum, EventEnum> eventContext=EventContextImpl.getInstance();
-        EventImpl<EventEnum> event=EventImpl.getInstance();
-        event.eventId(EventEnum.EVENT_BOOKING)
-        .payload("订单: xxxxxxx","记账: 用户积分、信誉分改动");
-        eventContext.stateId(StateEnum.STATE_WAIT_BOOKING)
-        .event(event);
-//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
-        IStateContext<StateEnum, EventEnum> stateContext=stateMachine.fireEvent(StateEnum.STATE_WAIT_BOOKING,EventEnum.EVENT_BOOKING,"订单: xxxxxxx","记账: 用户积分、信誉分改动");
-
-        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n",stateContext.getStateId(),stateContext.getPayload());
-        }
-
-@Test
-public void cancel(){
-        //07、取消订单
-        EventContextImpl<StateEnum, EventEnum> eventContext=EventContextImpl.getInstance();
-        EventImpl<EventEnum> event=EventImpl.getInstance();
-        event.eventId(EventEnum.EVENT_CANCEL)
-        .payload("订单: xxxxxxx","取消订单理由: 点错了");
-        eventContext.stateId(StateEnum.STATE_WAIT_PAY)
-        .event(event);
-//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
-        IStateContext<StateEnum, EventEnum> stateContext=stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY,EventEnum.EVENT_CANCEL,"订单: xxxxxxx","取消订单理由: 点错了");
-
-        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n",stateContext.getStateId(),stateContext.getPayload());
-        }
-
-@Test
-public void close(){
-        //08、关闭订单
-        EventContextImpl<StateEnum, EventEnum> eventContext=EventContextImpl.getInstance();
-        EventImpl<EventEnum> event=EventImpl.getInstance();
-        event.eventId(EventEnum.EVENT_CLOSE)
-        .payload("订单: xxxxxxx","关闭订单理由: 点错了");
-        eventContext.stateId(StateEnum.STATE_WAIT_PAY)
-        .event(event);
-//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
-        IStateContext<StateEnum, EventEnum> stateContext=stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY,EventEnum.EVENT_CLOSE,"订单: xxxxxxx","关闭订单理由: 点错了");
-
-        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n",stateContext.getStateId(),stateContext.getPayload());
-        }
+```java
+IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY, EventEnum.EVENT_PAY, "订单: xxxxxxx", "支付金额: 10");
 ```
 
 #### Spring框架下使用
@@ -777,15 +711,28 @@ public void close(){
 
 ##### 2、修改配置
 
+enable：是否开启状态机自动组装
+
+print：组装状态机成功后是否打印状态机内部结构
+
 ```yaml
 zhm:
   statemachine:
     enable: true
+    print: true
 ```
 
 ##### 3、定义状态机组件
 
 如果一个实现了ITransitionAdapter接口的类被@StateMachineComponent注解，且用@StateMachineCondition、@StateMachineAction指定了该类上的方法为条件判断方法和动作方法，那么这个类可被视为一个状态机组件。
+
+###### 注意
+
+- @StateMachineCondition、@StateMachineAction在@StateMachineComponent指定的类上有且仅能出现一次
+- @StateMachineCondition、@StateMachineAction若不指定ID则采用方法名作为ID
+- @StateMachineCondition、@StateMachineAction入参必须相同
+- @StateMachineCondition指定方法的返回值必须是boolean类型
+- @StateMachineCondition、@StateMachineAction指定的方法体内可以调用getCurrentState()方法获取当前状态，条件方法获取的当前状态是开始状态，动作方法获取的当前状态是流转后的状态（当状态机组件为内部流转组件时，开始状态与流转后的状态相同）。
 
 ```java
 /**
