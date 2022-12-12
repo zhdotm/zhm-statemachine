@@ -119,7 +119,7 @@ public interface IStateMachine<M, S, E, C, A> {
             ExceptionUtil.isTrue(state != null, StateMachineException.class, "状态机[%s, %s]发布事件[%s]失败: 不存在对应的状态[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), eventId, stateId);
 
             Collection<E> eventIds = state.getEventIds();
-            ExceptionUtil.isTrue(eventIds.contains(eventId), StateMachineException.class, "状态机[%s, %s]发布事件[%s]失败: 对应状态[%s]不存在指定事件[%S]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), eventId, stateId, eventId);
+            ExceptionUtil.isTrue(eventIds.contains(eventId), StateMachineException.class, "状态机[%s, %s]发布事件[%s]失败: 对应状态[%s]不存在指定事件[%s]", STATEMACHINE_ID_THREAD_LOCAL.get(), TRACE_ID_THREAD_LOCAL.get(), eventId, stateId, eventId);
 
             List<ITransition<S, E, C, A>> satisfiedInternalTransitions = Optional.ofNullable(getInternalTransition(stateId, eventId))
                     .orElse(new ArrayList<>())
