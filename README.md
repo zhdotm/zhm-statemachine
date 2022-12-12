@@ -58,72 +58,87 @@ builder.externalTransitions()
 创建外部流转
 
 ```java
-//待结算 -> 待支付
-stateMachineBuilder
-        .createExternalTransition()
-        .from(StateEnum.STATE_WAIT_BALANCE)
-        .on(EventEnum.EVENT_BALANCE)
-        .when(ConditionEnum.IS_ABLE_BALANCE,stateEnumEventEnumIEventContext->{
-        System.out.println("检查能否结算订单");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
+        //待初始化 -> 待营销
+        stateMachineBuilder
+                .createExternalTransition()
+                .from(StateEnum.STATE_WAIT_INIT)
+                .on(EventEnum.EVENT_INIT)
+                .when(ConditionEnum.IS_ABLE_INIT,
+                eventContext->{
+                System.out.println("检查能否初始化订单");
+                IEvent<EventEnum> event=eventContext.getEvent();
         Object[]payload=event.getPayload();
         System.out.println("收到事件参数负载: "+Arrays.toString(payload));
 
         return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_BALANCE,args->{
-        System.out.println("执行订单结算动作");
+        }).perform(ActionEnum.ACTION_INIT,
+        args->{
+        System.out.println("执行初始化订单动作");
         System.out.println("收到事件参数负载: "+Arrays.toString(args));
 
-        return"动作结算订单执行成功";
-        }).to(StateEnum.STATE_WAIT_PAY);
+        return"动作初始化执行成功";
+        })
+        .to(StateEnum.STATE_WAIT_PROMO)
+        .build();
 ```
 
 创建内部流转
 
 ```java
-//选择支付方式（待支付）
-stateMachineBuilder
-        .createInternalTransition()
-        .from(StateEnum.STATE_WAIT_PAY)
-        .on(EventEnum.EVENT_CHOOSE_PAY_WAY)
-        .when(ConditionEnum.IS_ABLE_CHOOSE_PAY_WAY,stateEnumEventEnumIEventContext->{
-        System.out.println("检查能否选择支付方式");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
-        Object[]payload=event.getPayload();
-        System.out.println("收到事件参数负载: "+Arrays.toString(payload));
+        //修改订单金额（待营销、待结算、待支付 ）
+        stateMachineBuilder
+                .createInternalTransition()
+                .from(StateEnum.STATE_WAIT_PROMO,
+                        StateEnum.STATE_WAIT_BALANCE,
+                        StateEnum.STATE_WAIT_PAY)
+                .on(EventEnum.EVENT_MODIFY_PRICE)
+                .when(ConditionEnum.IS_ABLE_MODIFY_PRICE,
+                        eventContext -> {
+                            System.out.println("检查能否修改订单金额");
+                            IEvent<EventEnum> event = eventContext.getEvent();
+                            Object[] payload = event.getPayload();
+                            System.out.println("收到事件参数负载: " + Arrays.toString(payload));
 
-        return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_CHOOSE_PAY_WAY,args->{
-        System.out.println("执行选择支付方式动作");
-        System.out.println("收到事件参数负载: "+Arrays.toString(args));
+                            return Boolean.TRUE;
+                        })
+                .perform(ActionEnum.ACTION_MODIFY_PRICE,
+                        args -> {
+                            System.out.println("执行修改订单金额动作");
+                            System.out.println("收到事件参数负载: " + Arrays.toString(args));
 
-        return"动作选择支付方式执行成功";
-        });
+                            return "动作修改订单金额执行成功";
+                        })
+                .build();
 ```
 
 创建批量流转
 
 ```java
-//修改订单金额（待营销、待结算、待支付 ）
-stateMachineBuilder
-        .createInternalTransition()
-        .from(StateEnum.STATE_WAIT_PROMO,
-        StateEnum.STATE_WAIT_BALANCE,
-        StateEnum.STATE_WAIT_PAY)
-        .on(EventEnum.EVENT_MODIFY_PRICE)
-        .when(ConditionEnum.IS_ABLE_MODIFY_PRICE,stateEnumEventEnumIEventContext->{
-        System.out.println("检查能否修改订单金额");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
+        //待初始化、待营销、待结算、待支付 -> 取消
+        stateMachineBuilder
+                .createExternalTransition()
+                .from(StateEnum.STATE_WAIT_INIT,
+                StateEnum.STATE_WAIT_PROMO,
+                StateEnum.STATE_WAIT_BALANCE,
+                StateEnum.STATE_WAIT_PAY)
+                .on(EventEnum.EVENT_CANCEL)
+                .when(ConditionEnum.IS_ABLE_CANCEL,
+                eventContext->{
+                System.out.println("检查能否取消订单");
+                IEvent<EventEnum> event=eventContext.getEvent();
         Object[]payload=event.getPayload();
         System.out.println("收到事件参数负载: "+Arrays.toString(payload));
 
         return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_MODIFY_PRICE,args->{
-        System.out.println("执行修改订单金额动作");
+        }).perform(ActionEnum.ACTION_CANCEL,
+        args->{
+        System.out.println("执行取消订单动作");
         System.out.println("收到事件参数负载: "+Arrays.toString(args));
 
-        return"动作修改订单金额执行成功";
-        });
+        return"动作取消执行成功";
+        })
+        .to(StateEnum.STATE_CANCELED)
+        .build();
 ```
 
 #### 2、引入事件上下文概念
@@ -143,15 +158,26 @@ States target=stateMachine.fireEvent(States.STATE1,Events.EVENT1,new Context());
 发送事件可以采用发送事件上下文语法，或类cola-statemachine的发送事件语法。
 
 ```java
-    //08、关闭订单
-        EventContextImpl<StateEnum, EventEnum> eventContext=EventContextImpl.getInstance();
-        EventImpl<EventEnum> event=EventImpl.getInstance();
-        event.eventId(EventEnum.EVENT_CLOSE)
-        .payload("订单: xxxxxxx","关闭订单理由: 点错了");
-        eventContext.stateId(StateEnum.STATE_WAIT_PAY)
-        .event(event);
-//        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
-        IStateContext<StateEnum, EventEnum> stateContext=stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY,EventEnum.EVENT_CLOSE,"订单: xxxxxxx","关闭订单理由: 点错了");
+    /**
+ * 02、营销（事件上下文方式）
+ */
+@Test
+public void promo1(){
+        IEventContextBuilder<StateEnum, EventEnum> eventContextBuilder=EventContextFactory.create();
+        IEventBuilder<EventEnum> eventBuilder=EventFactory.create();
+        IEvent<EventEnum> event=eventBuilder
+        .payload("订单: xxxxxxx","营销方案: 满100减50")
+        .id(EventEnum.EVENT_PROMO)
+        .build();
+        IEventContext<StateEnum, EventEnum> eventContext=eventContextBuilder
+        .from(StateEnum.STATE_WAIT_PROMO)
+        .on(event)
+        .build();
+
+        IStateContext<StateEnum, EventEnum> stateContext=stateMachine.fireEvent(eventContext);
+
+        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n",stateContext.getStateId(),stateContext.getPayload());
+        }
 ```
 
 #### 3、引入状态上下文概念
@@ -170,9 +196,26 @@ States target=stateMachine.fireEvent(States.STATE1,Events.EVENT1,new Context());
 触发完事件后，返回状态上下文，状态上下文中携带流转后的状态、状态负载，以及触发该流转的事件上下文。
 
 ```java
-IStateContext<StateEnum, EventEnum> stateContext=stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY,EventEnum.EVENT_CLOSE,"订单: xxxxxxx","关闭订单理由: 点错了");
+    /**
+     * 02、营销（事件上下文方式）
+     */
+    @Test
+    public void promo1() {
+        IEventContextBuilder<StateEnum, EventEnum> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<EventEnum> eventBuilder = EventFactory.create();
+        IEvent<EventEnum> event = eventBuilder
+                .payload("订单: xxxxxxx", "营销方案: 满100减50")
+                .id(EventEnum.EVENT_PROMO)
+                .build();
+        IEventContext<StateEnum, EventEnum> eventContext = eventContextBuilder
+                .from(StateEnum.STATE_WAIT_PROMO)
+                .on(event)
+                .build();
 
-        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n",stateContext.getStateId(),stateContext.getPayload());
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+
+        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
+    }
 ```
 
 #### 4、声明式定义状态机
@@ -466,29 +509,32 @@ enum ActionEnum {
 ##### 7、构建一个事件
 
 ```java
-IEventBuilder<String> eventBuilder = EventFactory.create();
-IEvent<String> event = eventBuilder
-        .payload("orderId:123456789")
-        .id("EVENT_CLOSE");
+        IEvent<EventEnum> event=eventBuilder
+        .payload("订单: xxxxxxx","营销方案: 满100减50")
+        .id(EventEnum.EVENT_PROMO)
+        .build();
 ```
 
 ##### 8、构建一个事件上下文
 
 ```java
-IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
-IEventBuilder<String> eventBuilder = EventFactory.create();
-IEvent<String> event = eventBuilder
-        .payload("orderId:123456789")
-        .id("EVENT_CLOSE");
-IEventContext<String, String> eventContext = eventContextBuilder.from("STATE_WAIT_PROMO")
-        .on(event);
+        IEventContextBuilder<StateEnum, EventEnum> eventContextBuilder=EventContextFactory.create();
+        IEventBuilder<EventEnum> eventBuilder=EventFactory.create();
+        IEvent<EventEnum> event=eventBuilder
+        .payload("订单: xxxxxxx","营销方案: 满100减50")
+        .id(EventEnum.EVENT_PROMO)
+        .build();
+        IEventContext<StateEnum, EventEnum> eventContext=eventContextBuilder
+        .from(StateEnum.STATE_WAIT_PROMO)
+        .on(event)
+        .build();
 ```
 
 ##### 9、构建状态机
 
 ```java
-public void build(){
-        StateMachineBuilder<StateMachineEnum, StateEnum, EventEnum, ConditionEnum, ActionEnum> stateMachineBuilder=StateMachineFactory.create();
+    public void build(){
+        IStateMachineBuilder<StateMachineEnum, StateEnum, EventEnum, ConditionEnum, ActionEnum> stateMachineBuilder=StateMachineFactory.create();
 
         //待初始化、待营销、待结算、待支付 -> 关闭
         stateMachineBuilder
@@ -498,19 +544,24 @@ public void build(){
         StateEnum.STATE_WAIT_BALANCE,
         StateEnum.STATE_WAIT_PAY)
         .on(EventEnum.EVENT_CLOSE)
-        .when(ConditionEnum.IS_ABLE_CLOSE,stateEnumEventEnumIEventContext->{
+        .when(ConditionEnum.IS_ABLE_CLOSE,
+        eventContext->{
         System.out.println("检查能否关闭订单");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
+        IEvent<EventEnum> event=eventContext.getEvent();
         Object[]payload=event.getPayload();
         System.out.println("收到事件参数负载: "+Arrays.toString(payload));
 
         return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_CLOSE,args->{
+        })
+        .perform(ActionEnum.ACTION_CLOSE,
+        args->{
         System.out.println("执行关闭订单动作");
         System.out.println("收到事件参数负载: "+Arrays.toString(args));
 
         return"动作关闭订单执行成功";
-        }).to(StateEnum.STATE_CLOSED);
+        })
+        .to(StateEnum.STATE_CLOSED)
+        .build();
 
         //待初始化、待营销、待结算、待支付 -> 取消
         stateMachineBuilder
@@ -520,19 +571,23 @@ public void build(){
         StateEnum.STATE_WAIT_BALANCE,
         StateEnum.STATE_WAIT_PAY)
         .on(EventEnum.EVENT_CANCEL)
-        .when(ConditionEnum.IS_ABLE_CANCEL,stateEnumEventEnumIEventContext->{
+        .when(ConditionEnum.IS_ABLE_CANCEL,
+        eventContext->{
         System.out.println("检查能否取消订单");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
+        IEvent<EventEnum> event=eventContext.getEvent();
         Object[]payload=event.getPayload();
         System.out.println("收到事件参数负载: "+Arrays.toString(payload));
 
         return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_CANCEL,args->{
+        }).perform(ActionEnum.ACTION_CANCEL,
+        args->{
         System.out.println("执行取消订单动作");
         System.out.println("收到事件参数负载: "+Arrays.toString(args));
 
         return"动作取消执行成功";
-        }).to(StateEnum.STATE_CANCELED);
+        })
+        .to(StateEnum.STATE_CANCELED)
+        .build();
 
         //修改订单金额（待营销、待结算、待支付 ）
         stateMachineBuilder
@@ -541,137 +596,170 @@ public void build(){
         StateEnum.STATE_WAIT_BALANCE,
         StateEnum.STATE_WAIT_PAY)
         .on(EventEnum.EVENT_MODIFY_PRICE)
-        .when(ConditionEnum.IS_ABLE_MODIFY_PRICE,stateEnumEventEnumIEventContext->{
+        .when(ConditionEnum.IS_ABLE_MODIFY_PRICE,
+        eventContext->{
         System.out.println("检查能否修改订单金额");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
+        IEvent<EventEnum> event=eventContext.getEvent();
         Object[]payload=event.getPayload();
         System.out.println("收到事件参数负载: "+Arrays.toString(payload));
 
         return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_MODIFY_PRICE,args->{
+        })
+        .perform(ActionEnum.ACTION_MODIFY_PRICE,
+        args->{
         System.out.println("执行修改订单金额动作");
         System.out.println("收到事件参数负载: "+Arrays.toString(args));
 
         return"动作修改订单金额执行成功";
-        });
+        })
+        .build();
 
         //待初始化 -> 待营销
         stateMachineBuilder
         .createExternalTransition()
         .from(StateEnum.STATE_WAIT_INIT)
         .on(EventEnum.EVENT_INIT)
-        .when(ConditionEnum.IS_ABLE_INIT,stateEnumEventEnumIEventContext->{
+        .when(ConditionEnum.IS_ABLE_INIT,
+        eventContext->{
         System.out.println("检查能否初始化订单");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
+        IEvent<EventEnum> event=eventContext.getEvent();
         Object[]payload=event.getPayload();
         System.out.println("收到事件参数负载: "+Arrays.toString(payload));
 
         return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_INIT,args->{
+        }).perform(ActionEnum.ACTION_INIT,
+        args->{
         System.out.println("执行初始化订单动作");
         System.out.println("收到事件参数负载: "+Arrays.toString(args));
 
         return"动作初始化执行成功";
-        }).to(StateEnum.STATE_WAIT_PROMO);
+        })
+        .to(StateEnum.STATE_WAIT_PROMO)
+        .build();
 
         //待营销 -> 待结算
         stateMachineBuilder
         .createExternalTransition()
         .from(StateEnum.STATE_WAIT_PROMO)
         .on(EventEnum.EVENT_PROMO)
-        .when(ConditionEnum.IS_ABLE_PROMO,stateEnumEventEnumIEventContext->{
+        .when(ConditionEnum.IS_ABLE_PROMO,
+        eventContext->{
         System.out.println("检查能否给订单使用优惠券");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
+        IEvent<EventEnum> event=eventContext.getEvent();
         Object[]payload=event.getPayload();
         System.out.println("收到事件参数负载: "+Arrays.toString(payload));
 
         return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_PROMO,args->{
+        })
+        .perform(ActionEnum.ACTION_PROMO,
+        args->{
         System.out.println("执行订单营销动作");
         System.out.println("收到事件参数负载: "+Arrays.toString(args));
 
         return"动作营销订单执行成功";
-        }).to(StateEnum.STATE_WAIT_BALANCE);
+        })
+        .to(StateEnum.STATE_WAIT_BALANCE)
+        .build();
 
         //待结算 -> 待支付
         stateMachineBuilder
         .createExternalTransition()
         .from(StateEnum.STATE_WAIT_BALANCE)
         .on(EventEnum.EVENT_BALANCE)
-        .when(ConditionEnum.IS_ABLE_BALANCE,stateEnumEventEnumIEventContext->{
+        .when(ConditionEnum.IS_ABLE_BALANCE,
+        eventContext->{
         System.out.println("检查能否结算订单");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
+        IEvent<EventEnum> event=eventContext.getEvent();
         Object[]payload=event.getPayload();
         System.out.println("收到事件参数负载: "+Arrays.toString(payload));
 
         return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_BALANCE,args->{
+        })
+        .perform(ActionEnum.ACTION_BALANCE,
+        args->{
         System.out.println("执行订单结算动作");
         System.out.println("收到事件参数负载: "+Arrays.toString(args));
 
         return"动作结算订单执行成功";
-        }).to(StateEnum.STATE_WAIT_PAY);
+        })
+        .to(StateEnum.STATE_WAIT_PAY)
+        .build();
 
         //选择支付方式（待支付）
         stateMachineBuilder
         .createInternalTransition()
         .from(StateEnum.STATE_WAIT_PAY)
         .on(EventEnum.EVENT_CHOOSE_PAY_WAY)
-        .when(ConditionEnum.IS_ABLE_CHOOSE_PAY_WAY,stateEnumEventEnumIEventContext->{
+        .when(ConditionEnum.IS_ABLE_CHOOSE_PAY_WAY,
+        eventContext->{
         System.out.println("检查能否选择支付方式");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
+        IEvent<EventEnum> event=eventContext.getEvent();
         Object[]payload=event.getPayload();
         System.out.println("收到事件参数负载: "+Arrays.toString(payload));
 
         return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_CHOOSE_PAY_WAY,args->{
+        })
+        .perform(ActionEnum.ACTION_CHOOSE_PAY_WAY,
+        args->{
         System.out.println("执行选择支付方式动作");
         System.out.println("收到事件参数负载: "+Arrays.toString(args));
 
         return"动作选择支付方式执行成功";
-        });
+        })
+        .build();
 
         //待支付 -> 待记账
         stateMachineBuilder
         .createExternalTransition()
         .from(StateEnum.STATE_WAIT_PAY)
         .on(EventEnum.EVENT_PAY)
-        .when(ConditionEnum.IS_ABLE_PAY,stateEnumEventEnumIEventContext->{
+        .when(ConditionEnum.IS_ABLE_PAY,
+        eventContext->{
         System.out.println("检查能否支付订单");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
+        IEvent<EventEnum> event=eventContext.getEvent();
         Object[]payload=event.getPayload();
         System.out.println("收到事件参数负载: "+Arrays.toString(payload));
 
         return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_PAY,args->{
+        })
+        .perform(ActionEnum.ACTION_PAY,
+        args->{
         System.out.println("执行订单结算动作");
         System.out.println("收到事件参数负载: "+Arrays.toString(args));
 
         return"动作结算订单执行成功";
-        }).to(StateEnum.STATE_WAIT_BOOKING);
+        })
+        .to(StateEnum.STATE_WAIT_BOOKING)
+        .build();
 
         //待记账 -> 完成
         stateMachineBuilder
         .createExternalTransition()
         .from(StateEnum.STATE_WAIT_BOOKING)
         .on(EventEnum.EVENT_BOOKING)
-        .when(ConditionEnum.IS_ABLE_BOOKING,stateEnumEventEnumIEventContext->{
+        .when(ConditionEnum.IS_ABLE_BOOKING,
+        eventContext->{
         System.out.println("检查能否记账");
-        IEvent<EventEnum> event=stateEnumEventEnumIEventContext.getEvent();
+        IEvent<EventEnum> event=eventContext.getEvent();
         Object[]payload=event.getPayload();
         System.out.println("收到事件参数负载: "+Arrays.toString(payload));
 
         return Boolean.TRUE;
-        }).perform(ActionEnum.ACTION_BOOKING,args->{
+        })
+        .perform(ActionEnum.ACTION_BOOKING,
+        args->{
         System.out.println("执行订单记账动作");
         System.out.println("收到事件参数负载: "+Arrays.toString(args));
 
         return"动作订单记账执行成功";
-        }).to(StateEnum.STATE_FINISHED);
+        })
+        .to(StateEnum.STATE_FINISHED)
+        .build();
 
         //构建租金订单状态机
         stateMachine=stateMachineBuilder.build(StateMachineEnum.RENT_ORDER);
         }
+
 ```
 
 ##### 8、发送事件
@@ -679,21 +767,38 @@ public void build(){
 ###### 8.1、使用事件上下文发送
 
 ```java
-        //发送事件上下文发送所有信息
-        IEventContextBuilder<StateEnum, EventEnum> eventContextBuilder = EventContextFactory.create();
-        IEventBuilder<EventEnum> eventBuilder = EventFactory.create();
-        IEvent<EventEnum> event = eventBuilder.payload("订单: xxxxxxx", "支付金额: 10")
-                .id(EventEnum.EVENT_PAY);
-        IEventContext<StateEnum, EventEnum> eventContext = eventContextBuilder
-                .from(StateEnum.STATE_WAIT_PAY)
-                .on(event);
-        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);
+    /**
+ * 02、营销（事件上下文方式）
+ */
+public void promo1(){
+        IEventContextBuilder<StateEnum, EventEnum> eventContextBuilder=EventContextFactory.create();
+        IEventBuilder<EventEnum> eventBuilder=EventFactory.create();
+        IEvent<EventEnum> event=eventBuilder
+        .payload("订单: xxxxxxx","营销方案: 满100减50")
+        .id(EventEnum.EVENT_PROMO)
+        .build();
+        IEventContext<StateEnum, EventEnum> eventContext=eventContextBuilder
+        .from(StateEnum.STATE_WAIT_PROMO)
+        .on(event)
+        .build();
+
+        IStateContext<StateEnum, EventEnum> stateContext=stateMachine.fireEvent(eventContext);
+
+        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n",stateContext.getStateId(),stateContext.getPayload());
+        }
 ```
 
 ###### 8.2、原生发送
 
 ```java
-IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PAY, EventEnum.EVENT_PAY, "订单: xxxxxxx", "支付金额: 10");
+    /**
+     * 02、营销（原生方式）
+     */
+    public void promo2() {
+        IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(StateEnum.STATE_WAIT_PROMO, EventEnum.EVENT_PROMO, "订单: xxxxxxx", "营销方案: 满100减50");
+
+        System.out.printf("执行后的状态[%s], 执行后的结果[%s]%n", stateContext.getStateId(), stateContext.getPayload());
+    }
 ```
 
 #### Spring框架下使用
@@ -726,13 +831,14 @@ zhm:
 
 如果一个实现了ITransitionAdapter接口的类被@StateMachineComponent注解，且用@StateMachineCondition、@StateMachineAction指定了该类上的方法为条件判断方法和动作方法，那么这个类可被视为一个状态机组件。
 
-###### 注意
+###### 3.1、注意
 
 - @StateMachineCondition、@StateMachineAction在@StateMachineComponent指定的类上有且仅能出现一次
 - @StateMachineCondition、@StateMachineAction若不指定ID则采用方法名作为ID
 - @StateMachineCondition、@StateMachineAction入参必须相同
 - @StateMachineCondition指定方法的返回值必须是boolean类型
-- @StateMachineCondition、@StateMachineAction指定的方法体内可以调用getCurrentState()方法获取当前状态，条件方法获取的当前状态是开始状态，动作方法获取的当前状态是流转后的状态（当状态机组件为内部流转组件时，开始状态与流转后的状态相同）。
+- @StateMachineCondition、@StateMachineAction指定的方法体内可以调用getCurrentState()
+  方法获取当前状态，条件方法获取的当前状态是开始状态，动作方法获取的当前状态是流转后的状态（当状态机组件为内部流转组件时，开始状态与流转后的状态相同）。
 
 ```java
 /**
@@ -1046,91 +1152,269 @@ public class OrderCloseService implements ITransitionAdapter {
 ##### 4、发送事件
 
 ```java
-/**
- * 关闭订单
- */
-@Test
-public void close(){
-        IStateContext<String, String> stateContext=StateMachineSupport
-        .fireEvent("RENT_ORDER","STATE_WAIT_PROMO","EVENT_CLOSE","orderId:123456789");
+
+    /**
+     * 关闭订单（事件上下文方式）
+     */
+    @Test
+    public void close1() {
+
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:123456789")
+                .id("EVENT_CLOSE")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_PROMO")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport.fireEvent("RENT_ORDER", eventContext);
 
         System.out.println(JSON.toJSONString(stateContext));
-        }
+    }
 
-/**
- * 取消订单
- */
-@Test
-public void cancel(){
-        IStateContext<String, String> stateContext=StateMachineSupport
-        .fireEvent("RENT_ORDER","STATE_WAIT_PAY","EVENT_CANCEL","orderId:123456789");
-
-        System.out.println(JSON.toJSONString(stateContext));
-        }
-
-/**
- * 初始化订单
- */
-@Test
-public void init(){
-        IStateContext<String, String> stateContext=StateMachineSupport
-        .fireEvent("RENT_ORDER","STATE_WAIT_INIT","EVENT_INIT","orderId:111111","buyerId:2222222","commodityId:333333",5,500L);
+    /**
+     * 关闭订单（原生方式）
+     */
+    @Test
+    public void close2() {
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", "STATE_WAIT_PROMO", "EVENT_CLOSE", "orderId:123456789");
 
         System.out.println(JSON.toJSONString(stateContext));
-        }
+    }
 
-/**
- * 营销订单
- */
-@Test
-public void promo(){
-        IStateContext<String, String> stateContext=StateMachineSupport
-        .fireEvent("RENT_ORDER","STATE_WAIT_PROMO","EVENT_PROMO","orderId:111111","couponId:222222");
 
-        System.out.println(JSON.toJSONString(stateContext));
-        }
-
-/**
- * 修改订单金额
- */
-@Test
-public void modifyPrice(){
-        IStateContext<String, String> stateContext=StateMachineSupport
-        .fireEvent("RENT_ORDER","STATE_WAIT_PAY","EVENT_MODIFY_PRICE","orderId:111111",200L);
-
-        System.out.println(JSON.toJSONString(stateContext));
-        }
-
-/**
- * 结算订单
- */
-@Test
-public void balance(){
-        IStateContext<String, String> stateContext=StateMachineSupport
-        .fireEvent("RENT_ORDER","STATE_WAIT_BALANCE","EVENT_BALANCE","orderId:111111");
+    /**
+     * 取消订单（事件上下文方式）
+     */
+    @Test
+    public void cancel1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:123456789")
+                .id("EVENT_CLOSE")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_PROMO")
+                .on(event)
+                .build();
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
 
         System.out.println(JSON.toJSONString(stateContext));
-        }
+    }
 
-/**
- * 支付订单
- */
-@Test
-public void pay(){
-        IStateContext<String, String> stateContext=StateMachineSupport
-        .fireEvent("RENT_ORDER","STATE_WAIT_PAY","EVENT_PAY","orderId:111111");
-
-        System.out.println(JSON.toJSONString(stateContext));
-        }
-
-/**
- * 记账订单
- */
-@Test
-public void booking(){
-        IStateContext<String, String> stateContext=StateMachineSupport
-        .fireEvent("RENT_ORDER","STATE_WAIT_BOOKING","EVENT_BOOKING","orderId:111111");
+    /**
+     * 取消订单（原生方式）
+     */
+    @Test
+    public void cancel2() {
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", "STATE_WAIT_PAY", "EVENT_CANCEL", "orderId:123456789");
 
         System.out.println(JSON.toJSONString(stateContext));
-        }
+    }
+
+    /**
+     * 初始化订单（事件上下文方式）
+     */
+    @Test
+    public void init1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111", "buyerId:2222222", "commodityId:333333", 5, 500L)
+                .id("EVENT_INIT")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_INIT")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 初始化订单（原生方式）
+     */
+    @Test
+    public void init2() {
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", "STATE_WAIT_INIT", "EVENT_INIT", "orderId:111111", "buyerId:2222222", "commodityId:333333", 5, 500L);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 营销订单（事件上下文方式）
+     */
+    @Test
+    public void promo1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111", "couponId:222222")
+                .id("EVENT_PROMO")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_PROMO")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 营销订单（原生方式）
+     */
+    @Test
+    public void promo2() {
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", "STATE_WAIT_PROMO", "EVENT_PROMO", "orderId:111111", "couponId:222222");
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 修改订单金额（事件上下文方式）
+     */
+    @Test
+    public void modifyPrice1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111", 200L)
+                .id("EVENT_MODIFY_PRICE")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_PAY")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 修改订单金额（原生方式）
+     */
+    @Test
+    public void modifyPrice2() {
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", "STATE_WAIT_PAY", "EVENT_MODIFY_PRICE", "orderId:111111", 200L);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 结算订单（事件上下文方式）
+     */
+    @Test
+    public void balance1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111")
+                .id("EVENT_BALANCE")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_BALANCE")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 结算订单（原生方式）
+     */
+    @Test
+    public void balance2() {
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", "STATE_WAIT_BALANCE", "EVENT_BALANCE", "orderId:111111");
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 支付订单（事件上下文方式）
+     */
+    @Test
+    public void pay1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111")
+                .id("EVENT_PAY")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_PAY")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 支付订单（原生方式）
+     */
+    @Test
+    public void pay2() {
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", "STATE_WAIT_PAY", "EVENT_PAY", "orderId:111111");
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 记账订单（事件上下文方式）
+     */
+    @Test
+    public void booking1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111")
+                .id("EVENT_BOOKING")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_BOOKING")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 记账订单（原生方式）
+     */
+    @Test
+    public void booking2() {
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", "STATE_WAIT_BOOKING", "EVENT_BOOKING", "orderId:111111");
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
 ```

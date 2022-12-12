@@ -23,10 +23,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class AppTest {
 
     /**
-     * 关闭订单
+     * 关闭订单（事件上下文方式）
      */
     @Test
-    public void close() {
+    public void close1() {
 
         IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
         IEventBuilder<String> eventBuilder = EventFactory.create();
@@ -34,12 +34,10 @@ public class AppTest {
                 .payload("orderId:123456789")
                 .id("EVENT_CLOSE")
                 .build();
-        IEventContext<String, String> eventContext = eventContextBuilder.from("STATE_WAIT_PROMO")
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_PROMO")
                 .on(event)
                 .build();
-
-//        IStateContext<String, String> stateContext = StateMachineSupport
-//                .fireEvent("RENT_ORDER", "STATE_WAIT_PROMO", "EVENT_CLOSE", "orderId:123456789");
 
         IStateContext<String, String> stateContext = StateMachineSupport.fireEvent("RENT_ORDER", eventContext);
 
@@ -47,10 +45,43 @@ public class AppTest {
     }
 
     /**
-     * 取消订单
+     * 关闭订单（原生方式）
      */
     @Test
-    public void cancel() {
+    public void close2() {
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", "STATE_WAIT_PROMO", "EVENT_CLOSE", "orderId:123456789");
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+
+    /**
+     * 取消订单（事件上下文方式）
+     */
+    @Test
+    public void cancel1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:123456789")
+                .id("EVENT_CLOSE")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_PROMO")
+                .on(event)
+                .build();
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 取消订单（原生方式）
+     */
+    @Test
+    public void cancel2() {
         IStateContext<String, String> stateContext = StateMachineSupport
                 .fireEvent("RENT_ORDER", "STATE_WAIT_PAY", "EVENT_CANCEL", "orderId:123456789");
 
@@ -58,10 +89,32 @@ public class AppTest {
     }
 
     /**
-     * 初始化订单
+     * 初始化订单（事件上下文方式）
      */
     @Test
-    public void init() {
+    public void init1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111", "buyerId:2222222", "commodityId:333333", 5, 500L)
+                .id("EVENT_INIT")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_INIT")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 初始化订单（原生方式）
+     */
+    @Test
+    public void init2() {
         IStateContext<String, String> stateContext = StateMachineSupport
                 .fireEvent("RENT_ORDER", "STATE_WAIT_INIT", "EVENT_INIT", "orderId:111111", "buyerId:2222222", "commodityId:333333", 5, 500L);
 
@@ -69,10 +122,32 @@ public class AppTest {
     }
 
     /**
-     * 营销订单
+     * 营销订单（事件上下文方式）
      */
     @Test
-    public void promo() {
+    public void promo1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111", "couponId:222222")
+                .id("EVENT_PROMO")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_PROMO")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 营销订单（原生方式）
+     */
+    @Test
+    public void promo2() {
         IStateContext<String, String> stateContext = StateMachineSupport
                 .fireEvent("RENT_ORDER", "STATE_WAIT_PROMO", "EVENT_PROMO", "orderId:111111", "couponId:222222");
 
@@ -80,10 +155,32 @@ public class AppTest {
     }
 
     /**
-     * 修改订单金额
+     * 修改订单金额（事件上下文方式）
      */
     @Test
-    public void modifyPrice() {
+    public void modifyPrice1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111", 200L)
+                .id("EVENT_MODIFY_PRICE")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_PAY")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 修改订单金额（原生方式）
+     */
+    @Test
+    public void modifyPrice2() {
         IStateContext<String, String> stateContext = StateMachineSupport
                 .fireEvent("RENT_ORDER", "STATE_WAIT_PAY", "EVENT_MODIFY_PRICE", "orderId:111111", 200L);
 
@@ -91,10 +188,32 @@ public class AppTest {
     }
 
     /**
-     * 结算订单
+     * 结算订单（事件上下文方式）
      */
     @Test
-    public void balance() {
+    public void balance1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111")
+                .id("EVENT_BALANCE")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_BALANCE")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 结算订单（原生方式）
+     */
+    @Test
+    public void balance2() {
         IStateContext<String, String> stateContext = StateMachineSupport
                 .fireEvent("RENT_ORDER", "STATE_WAIT_BALANCE", "EVENT_BALANCE", "orderId:111111");
 
@@ -102,10 +221,32 @@ public class AppTest {
     }
 
     /**
-     * 支付订单
+     * 支付订单（事件上下文方式）
      */
     @Test
-    public void pay() {
+    public void pay1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111")
+                .id("EVENT_PAY")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_PAY")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 支付订单（原生方式）
+     */
+    @Test
+    public void pay2() {
         IStateContext<String, String> stateContext = StateMachineSupport
                 .fireEvent("RENT_ORDER", "STATE_WAIT_PAY", "EVENT_PAY", "orderId:111111");
 
@@ -113,10 +254,32 @@ public class AppTest {
     }
 
     /**
-     * 记账订单
+     * 记账订单（事件上下文方式）
      */
     @Test
-    public void booking() {
+    public void booking1() {
+        IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.create();
+        IEventBuilder<String> eventBuilder = EventFactory.create();
+        IEvent<String> event = eventBuilder
+                .payload("orderId:111111")
+                .id("EVENT_BOOKING")
+                .build();
+        IEventContext<String, String> eventContext = eventContextBuilder
+                .from("STATE_WAIT_BOOKING")
+                .on(event)
+                .build();
+
+        IStateContext<String, String> stateContext = StateMachineSupport
+                .fireEvent("RENT_ORDER", eventContext);
+
+        System.out.println(JSON.toJSONString(stateContext));
+    }
+
+    /**
+     * 记账订单（原生方式）
+     */
+    @Test
+    public void booking2() {
         IStateContext<String, String> stateContext = StateMachineSupport
                 .fireEvent("RENT_ORDER", "STATE_WAIT_BOOKING", "EVENT_BOOKING", "orderId:111111");
 
