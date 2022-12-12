@@ -2,7 +2,6 @@ package io.github.zhdotm.statemachine.model.support.builder.machine.impl;
 
 import io.github.zhdotm.statemachine.model.domain.ITransition;
 import io.github.zhdotm.statemachine.model.support.builder.machine.IExternalTransitionToBuilder;
-import lombok.NonNull;
 
 /**
  * @author zhihao.mao
@@ -13,16 +12,16 @@ public class ExternalTransitionToBuilderImpl<S, E, C, A> implements IExternalTra
     private ITransition<S, E, C, A> transition;
 
     public static <S, E, C, A> ExternalTransitionToBuilderImpl<S, E, C, A> getInstance(ITransition<S, E, C, A> transition) {
+        ExternalTransitionToBuilderImpl<S, E, C, A> transitionToBuilder = new ExternalTransitionToBuilderImpl<>();
+        transitionToBuilder.transition = transition;
 
-        ExternalTransitionToBuilderImpl<S, E, C, A> toBuilder = new ExternalTransitionToBuilderImpl<>();
-        toBuilder.transition = transition;
-
-        return toBuilder;
+        return transitionToBuilder;
     }
 
     @Override
-    public void to(@NonNull S stateId) {
-        transition.to(stateId);
+    public ITransition<S, E, C, A> build() {
+
+        return transition;
     }
 
 }

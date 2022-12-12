@@ -32,9 +32,11 @@ public class AppTest {
         IEventBuilder<String> eventBuilder = EventFactory.create();
         IEvent<String> event = eventBuilder
                 .payload("orderId:123456789")
-                .id("EVENT_CLOSE");
+                .id("EVENT_CLOSE")
+                .build();
         IEventContext<String, String> eventContext = eventContextBuilder.from("STATE_WAIT_PROMO")
-                .on(event);
+                .on(event)
+                .build();
 
 //        IStateContext<String, String> stateContext = StateMachineSupport
 //                .fireEvent("RENT_ORDER", "STATE_WAIT_PROMO", "EVENT_CLOSE", "orderId:123456789");

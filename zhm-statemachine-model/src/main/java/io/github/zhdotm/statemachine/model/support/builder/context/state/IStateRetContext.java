@@ -6,7 +6,7 @@ import io.github.zhdotm.statemachine.model.domain.IStateContext;
  * @author zhihao.mao
  */
 
-public interface IStateContextToBuilder<S, E> {
+public interface IStateRetContext<S, E> {
 
-    IStateRetContext<S, E> ret(Object obj);
+    IStateContext<S, E> build();
 }

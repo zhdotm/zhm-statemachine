@@ -6,7 +6,7 @@ import io.github.zhdotm.statemachine.model.domain.ITransition;
  * @author zhihao.mao
  */
 
-public interface IExternalTransitionToBuilder<S, E, C, A> {
+public interface IInternalTransitionPerformBuilder<S, E, C, A> {
 
     ITransition<S, E, C, A> build();
 }

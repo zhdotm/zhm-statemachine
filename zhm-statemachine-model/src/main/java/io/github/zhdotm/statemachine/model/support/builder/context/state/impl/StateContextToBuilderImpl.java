@@ -1,8 +1,8 @@
 package io.github.zhdotm.statemachine.model.support.builder.context.state.impl;
 
-import io.github.zhdotm.statemachine.model.domain.IStateContext;
 import io.github.zhdotm.statemachine.model.domain.impl.StateContextImpl;
 import io.github.zhdotm.statemachine.model.support.builder.context.state.IStateContextToBuilder;
+import io.github.zhdotm.statemachine.model.support.builder.context.state.IStateRetContext;
 import lombok.AllArgsConstructor;
 
 /**
@@ -20,9 +20,10 @@ public class StateContextToBuilderImpl<S, E> implements IStateContextToBuilder<S
     }
 
     @Override
-    public IStateContext<S, E> ret(Object obj) {
+    public IStateRetContext<S, E> ret(Object obj) {
+        stateContext.ret(obj);
 
-        return stateContext.ret(obj);
+        return StateRetContextImpl.getInstance(stateContext);
     }
 
 }

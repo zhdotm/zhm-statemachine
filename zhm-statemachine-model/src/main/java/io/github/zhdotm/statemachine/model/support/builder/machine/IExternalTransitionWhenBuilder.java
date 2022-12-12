@@ -8,5 +8,5 @@ import java.util.function.Function;
 
 public interface IExternalTransitionWhenBuilder<S, E, C, A> {
 
-    IExternalTransitionToBuilder<S, E, C, A> perform(A actionId, Function<Object[], Object> doSomething);
+    IExternalTransitionPerformBuilder<S, E, C, A> perform(A actionId, Function<Object[], Object> doSomething);
 }
