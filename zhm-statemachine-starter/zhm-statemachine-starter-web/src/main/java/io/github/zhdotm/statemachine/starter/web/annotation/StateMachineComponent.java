@@ -24,4 +24,6 @@ public @interface StateMachineComponent {
     String on();
 
     String to() default "";
+
+    int sort() default Integer.MAX_VALUE;
 }

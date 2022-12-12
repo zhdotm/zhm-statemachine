@@ -71,6 +71,7 @@ public interface ITransitionAdapter {
                     }
                 });
         transition.type(stateMachineComponent.type())
+                .sort(stateMachineComponent.sort())
                 .from(Arrays.asList(stateMachineComponent.from()))
                 .on(stateMachineComponent.on())
                 .when(condition)
