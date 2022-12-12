@@ -732,7 +732,8 @@ zhm:
 - @StateMachineCondition、@StateMachineAction若不指定ID则采用方法名作为ID
 - @StateMachineCondition、@StateMachineAction入参必须相同
 - @StateMachineCondition指定方法的返回值必须是boolean类型
-- @StateMachineCondition、@StateMachineAction指定的方法体内可以调用getCurrentState()方法获取当前状态，条件方法获取的当前状态是开始状态，动作方法获取的当前状态是流转后的状态（当状态机组件为内部流转组件时，开始状态与流转后的状态相同）。
+- @StateMachineCondition、@StateMachineAction指定的方法体内可以调用getCurrentState()
+  方法获取当前状态，条件方法获取的当前状态是开始状态，动作方法获取的当前状态是流转后的状态（当状态机组件为内部流转组件时，开始状态与流转后的状态相同）。
 
 ```java
 /**

@@ -21,7 +21,7 @@ public class EventOnContextImpl<S, E> implements IEventOnContext<S, E> {
 
     @Override
     public IEventContext<S, E> build() {
-        
+
         return eventContext;
     }
 
