@@ -147,7 +147,9 @@ public interface ITransition<S, E, C, A> {
         StateMachineLog.info("状态机流程日志[%s, %s]: 成功匹配[%s]动作[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), getType().getDescription(), actionId);
         Object result = action.invoke(eventContext.getEvent().getPayload());
 
-        IStateContext<S, E> stateContext = stateContextToBuilder.ret(result);
+        IStateContext<S, E> stateContext = stateContextToBuilder
+                .ret(result)
+                .build();
 
         StateMachineLog.info("状态机流程日志[%s, %s]: 执行结果[%s], 转换后状态[%s]", IStateMachine.STATEMACHINE_ID_THREAD_LOCAL.get(), IStateMachine.TRACE_ID_THREAD_LOCAL.get(), stateContext.getPayload(), stateContext.getStateId());
 

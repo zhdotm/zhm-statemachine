@@ -2,7 +2,7 @@ package io.github.zhdotm.statemachine.model.support.builder.machine.impl;
 
 import io.github.zhdotm.statemachine.model.domain.ITransition;
 import io.github.zhdotm.statemachine.model.domain.impl.ActionImpl;
-import io.github.zhdotm.statemachine.model.support.builder.machine.IExternalTransitionToBuilder;
+import io.github.zhdotm.statemachine.model.support.builder.machine.IExternalTransitionPerformBuilder;
 import io.github.zhdotm.statemachine.model.support.builder.machine.IExternalTransitionWhenBuilder;
 import lombok.NonNull;
 
@@ -24,14 +24,14 @@ public class ExternalTransitionWhenBuilderImpl<S, E, C, A> implements IExternalT
     }
 
     @Override
-    public IExternalTransitionToBuilder<S, E, C, A> perform(@NonNull A actionId, @NonNull Function<Object[], Object> execute) {
+    public IExternalTransitionPerformBuilder<S, E, C, A> perform(@NonNull A actionId, @NonNull Function<Object[], Object> execute) {
         ActionImpl<A> action = ActionImpl.getInstance();
         action.actionId(actionId)
                 .execute(execute);
 
         transition.perform(action);
 
-        return ExternalTransitionToBuilderImpl.getInstance(transition);
+        return ExternalTransitionPerformBuilderImpl.getInstance(transition);
     }
 
 }

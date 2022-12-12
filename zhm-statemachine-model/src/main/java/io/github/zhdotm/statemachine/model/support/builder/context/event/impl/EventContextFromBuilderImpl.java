@@ -1,9 +1,9 @@
 package io.github.zhdotm.statemachine.model.support.builder.context.event.impl;
 
 import io.github.zhdotm.statemachine.model.domain.IEvent;
-import io.github.zhdotm.statemachine.model.domain.IEventContext;
 import io.github.zhdotm.statemachine.model.domain.impl.EventContextImpl;
 import io.github.zhdotm.statemachine.model.support.builder.context.event.IEventContextFromBuilder;
+import io.github.zhdotm.statemachine.model.support.builder.context.event.IEventOnContext;
 import lombok.AllArgsConstructor;
 
 /**
@@ -21,9 +21,10 @@ public class EventContextFromBuilderImpl<S, E> implements IEventContextFromBuild
     }
 
     @Override
-    public IEventContext<S, E> on(IEvent<E> event) {
+    public IEventOnContext<S, E> on(IEvent<E> event) {
+        eventContext.on(event);
 
-        return eventContext.on(event);
+        return EventOnContextImpl.getInstance(eventContext);
     }
 
 }
