@@ -8,5 +8,5 @@ import io.github.zhdotm.statemachine.model.domain.IEvent;
 
 public interface IEventPayloadBuilder<E> {
 
-    IEvent<E> build(E eventId);
+    IEvent<E> id(E eventId);
 }

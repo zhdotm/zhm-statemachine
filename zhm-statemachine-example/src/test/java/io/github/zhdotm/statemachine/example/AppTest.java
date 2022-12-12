@@ -32,7 +32,7 @@ public class AppTest {
         IEventBuilder<String> eventBuilder = EventFactory.create();
         IEvent<String> event = eventBuilder
                 .payload("orderId:123456789")
-                .build("EVENT_CLOSE");
+                .id("EVENT_CLOSE");
         IEventContext<String, String> eventContext = eventContextBuilder.from("STATE_WAIT_PROMO")
                 .on(event);
 

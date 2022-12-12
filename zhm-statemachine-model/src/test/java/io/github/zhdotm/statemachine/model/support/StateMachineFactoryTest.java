@@ -224,7 +224,7 @@ public class StateMachineFactoryTest {
         IEventBuilder<EventEnum> eventBuilder = EventFactory.create();
         IEvent<EventEnum> event = eventBuilder
                 .payload("用户: 张三", "订单: xxxxxxx", "金额: 99", "商品: 租金")
-                .build(EventEnum.EVENT_INIT);
+                .id(EventEnum.EVENT_INIT);
         IEventContext<StateEnum, EventEnum> eventContext = eventContextBuilder
                 .from(StateEnum.STATE_WAIT_INIT)
                 .on(event);
@@ -248,7 +248,7 @@ public class StateMachineFactoryTest {
         IEventContextBuilder<StateEnum, EventEnum> eventContextBuilder = EventContextFactory.create();
         IEventBuilder<EventEnum> eventBuilder = EventFactory.create();
         IEvent<EventEnum> event = eventBuilder.payload("订单: xxxxxxx", "营销方案: 满100减50")
-                .build(EventEnum.EVENT_PROMO);
+                .id(EventEnum.EVENT_PROMO);
         IEventContext<StateEnum, EventEnum> eventContext = eventContextBuilder.from(StateEnum.STATE_WAIT_PROMO)
                 .on(event);
         IStateContext<StateEnum, EventEnum> stateContext = stateMachine.fireEvent(eventContext);

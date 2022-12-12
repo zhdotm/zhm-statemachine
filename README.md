@@ -469,7 +469,7 @@ enum ActionEnum {
 IEventBuilder<String> eventBuilder = EventFactory.create();
 IEvent<String> event = eventBuilder
         .payload("orderId:123456789")
-        .build("EVENT_CLOSE");
+        .id("EVENT_CLOSE");
 ```
 
 ##### 8、构建一个事件上下文
@@ -479,7 +479,7 @@ IEventContextBuilder<String, String> eventContextBuilder = EventContextFactory.c
 IEventBuilder<String> eventBuilder = EventFactory.create();
 IEvent<String> event = eventBuilder
         .payload("orderId:123456789")
-        .build("EVENT_CLOSE");
+        .id("EVENT_CLOSE");
 IEventContext<String, String> eventContext = eventContextBuilder.from("STATE_WAIT_PROMO")
         .on(event);
 ```
@@ -683,7 +683,7 @@ public void build(){
         IEventContextBuilder<StateEnum, EventEnum> eventContextBuilder = EventContextFactory.create();
         IEventBuilder<EventEnum> eventBuilder = EventFactory.create();
         IEvent<EventEnum> event = eventBuilder.payload("订单: xxxxxxx", "支付金额: 10")
-                .build(EventEnum.EVENT_PAY);
+                .id(EventEnum.EVENT_PAY);
         IEventContext<StateEnum, EventEnum> eventContext = eventContextBuilder
                 .from(StateEnum.STATE_WAIT_PAY)
                 .on(event);

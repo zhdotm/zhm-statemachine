@@ -20,7 +20,7 @@ public class EventPayloadBuilderImpl<E> implements IEventPayloadBuilder<E> {
     }
 
     @Override
-    public IEvent<E> build(E eventId) {
+    public IEvent<E> id(E eventId) {
 
         return event.eventId(eventId);
     }
