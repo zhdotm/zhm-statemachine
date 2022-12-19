@@ -301,7 +301,154 @@ public class OrderBalanceService implements ITransitionAdapter {
 
 状态机
 
-### 使用
+### 基本使用
+
+#### 1、原生场景下使用
+
+##### 1.1、引入依赖
+
+```xml
+<dependency>
+    <groupId>io.github.zhdotm</groupId>
+    <artifactId>zhm-statemachine-model</artifactId>
+    <version>1.1.5</version>
+</dependency>
+```
+
+##### 1.2、构建状态机
+
+```java
+//1、利用状态机工厂创建一个状态机构造器
+IStateMachineBuilder<String, String, String, String, String> stateMachineBuilder = StateMachineFactory.create();
+
+//2、创建转换
+//2.1、创建外部转换
+stateMachineBuilder
+        .createExternalTransition()
+        //2.1.1、排序
+        .sort(1)
+        //2.1.2、来源状态
+        .from("state1", "state2")
+        //2.1.3、发生的事件
+        .on("event1")
+        //2.1.4、条件判断（判断事件能否通过）
+        .when("condition1",
+                eventContext -> {
+                    //收到的事件
+                    IEvent<String> event = eventContext.getEvent();
+                    //事件ID
+                    String eventId = event.getEventId();
+                    //事件携带的参数
+                    Object[] objs = event.getPayload();
+                    //收到事件时候的状态ID
+                    String stateId = eventContext.getStateId();
+
+                    return Boolean.TRUE;
+                })
+        //2.1.5、条件通过后，要执行的动作
+        .perform("action1", objs -> {
+            //objs是事件携带的参数
+            //经过一系列处理后，返回处理结果
+
+            return "ok";
+        })
+        //2.1.6、转换后的状态
+        .to("state3")
+        .build();
+//2.2、创建内部转换
+stateMachineBuilder.createInternalTransition()
+        //2.2.1、排序
+        .sort(2)
+        //2.2.2、来源状态
+        .from("state1")
+        //2.2.3、事件
+        .on("event2")
+        //2.2.4、条件判断
+        .when("condition2",
+                eventContext -> {
+                    return Boolean.TRUE;
+                })
+        //2.2.5、动作
+        .perform("action2",
+                objs -> null)
+        .build();
+
+//设置状态机ID
+IStateMachine<String, String, String, String, String> stateMachine = stateMachineBuilder
+        .build("stateMachine1");
+```
+
+##### 1.3、发送事件
+
+```java
+//发送事件
+IStateContext<String, String> stateContext = stateMachine.fireEvent("state1", "event1", "参数1", "参数2", "参数3");
+//事件上下文
+IEventContext<String, String> eventContext = stateContext.getEventContext();
+//转换后的状态
+String stateId = stateContext.getStateId();
+//动作执行结果
+Object payload = stateContext.getPayload();
+```
+
+#### 2、Spring框架下使用
+
+##### 2.1、引入依赖
+
+```xml
+<dependency>
+    <groupId>io.github.zhdotm</groupId>
+    <artifactId>zhm-statemachine-starter-web</artifactId>
+    <version>1.1.5</version>
+</dependency>
+```
+
+##### 2.2、修改配置
+
+enable：是否开启状态机自动组装
+
+print：组装状态机成功后是否打印状态机内部结构
+
+```yaml
+zhm:
+  statemachine:
+    enable: true
+    print: true
+```
+
+##### 2.3、定义状态机组件
+
+如果一个实现了ITransitionAdapter接口的类被@StateMachineComponent注解，且用@StateMachineCondition、@StateMachineAction指定了该类上的方法为条件判断方法和动作方法，那么这个类可被视为一个状态机组件。多个相同stateMachineId的状态机组件构成一个状态机。
+
+```java
+@Component
+@StateMachineComponent(
+        stateMachineId = "stateMachine1",
+        type = TransitionTypeEnum.EXTERNAL,
+        from = {"state1", "state2"},
+        on = "event1",
+        to = "state3"
+)
+public class AStateMachineComponent implements ITransitionAdapter {
+
+    @StateMachineCondition(conditionId = "isAbleToDoThis")
+    public Boolean check(String input) {
+        System.out.println("检查能否做某个事");
+
+        return Boolean.TRUE;
+    }
+
+    @StateMachineAction(actionId = "doSomething")
+    public String execute(String input) {
+        System.out.println("做某个事");
+
+        return "事情的执行结果";
+    }
+
+}
+```
+
+### 案例
 
 以订单系统为例
 
